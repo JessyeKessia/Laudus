@@ -7,8 +7,11 @@
 
 ## 👾 Padrões de projeto utilizados
 
+- Bridge
 - Observer
 - Chain of Responsibility
+- Decorator
+- Strategy
 
 ## 🛠️ Tecnologias Utilizadas
 
