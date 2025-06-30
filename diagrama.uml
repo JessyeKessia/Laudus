@@ -1,0 +1,287 @@
+@startuml
+!theme plain
+skinparam classAttributeIconStyle public private
+hide empty members
+
+' 0. Entidades de Domínio Básicas
+package "Entidades de Domínio" {
+    class Paciente {
+        +nome: String
+        +convenio: String
+        +id: String
+        +idade: int
+    }
+
+    class Medico {
+        +nome: String
+        +crm: String
+        +especialidade: String
+    }
+
+    enum TipoPrioridade {
+        URGENTE
+        POUCO_URGENTE
+        ROTINA
+    }
+}
+
+' 1. Bridge Pattern: Exame e Formatação de Laudo (R3, R4)
+package "Padrão Bridge: Laudo" {
+    interface FormatoLaudo {
+        +gerar(conteudoLaudo: String): String
+    }
+
+    class FormatoLaudoTexto implements FormatoLaudo {
+        +gerar(conteudoLaudo: String): String
+    }
+
+    class FormatoLaudoHtml implements FormatoLaudo {
+        +gerar(conteudoLaudo: String): String
+    }
+
+    class FormatoLaudoPdf implements FormatoLaudo {
+        +gerar(conteudoLaudo: String): String
+    }
+
+    abstract class Exame {
+        +idExame: String
+        +paciente: Paciente
+        +medicoSolicitante: Medico
+        +medicoResponsavel: Medico
+        +dataExame: Date
+        +precoBase: double
+        +prioridade: TipoPrioridade
+        +formatoLaudo: FormatoLaudo
+        -primeiroValidador: ValidadorExame // O início da cadeia de validação para este exame
+        -ultimoValidador: ValidadorExame // Para facilitar a adição no final da cadeia
+        +adicionarRegraValidacao(regra: ValidadorExame): void // Adiciona uma regra ao final da cadeia
+        +validar(): boolean // Inicia a validação pela cadeia
+        +calcularPreco(): double
+        +setFormatoLaudo(formato: FormatoLaudo): void
+        + abstract gerarLaudo(): String
+    }
+
+    class Hemograma extends Exame {
+        +gerarLaudo(): String
+    }
+
+    class Ultrassonografia extends Exame {
+        +gerarLaudo(): String
+    }
+
+    class RessonanciaMagnetica extends Exame {
+        +gerarLaudo(): String
+    }
+
+    ' Relações internas do Bridge
+    Exame "1" o-- "1" FormatoLaudo
+}
+
+
+' 2. Chain of Responsibility: Validação de Exames (R5)
+package "Padrão Chain of Responsibility: Validação" {
+    interface ValidadorExame {
+        +setProximo(proximo: ValidadorExame): ValidadorExame
+        +validar(exame: Exame): boolean
+    }
+
+    abstract class ValidadorBase implements ValidadorExame {
+        -proximo: ValidadorExame
+        +setProximo(proximo: ValidadorExame): ValidadorExame
+        +validar(exame: Exame): boolean
+    }
+
+    class ValidadorHemograma extends ValidadorBase {
+        +validar(exame: Exame): boolean
+    }
+
+    class ValidadorImplantes extends ValidadorBase {
+        +validar(exame: Exame): boolean
+    }
+
+    ' Relações internas da Cadeia
+    ValidadorBase "1" o-- "0..1" ValidadorExame
+}
+
+' 3. Observer Pattern: Notificações (R6)
+package "Padrão Observer: Notificações" {
+    interface ObservadorNotificacao {
+        +atualizar(paciente: Paciente, mensagem: String): void
+    }
+
+    class AssuntoNotificacao {
+        -observadores: List<ObservadorNotificacao>
+        +adicionarObservador(observador: ObservadorNotificacao): void
+        +removerObservador(observador: ObservadorNotificacao): void
+        +notificarObservadores(paciente: Paciente, mensagem: String): void
+    }
+
+    class NotificadorWhatsapp implements ObservadorNotificacao {
+        -fachadaComunicacao: FachadaNotificacaoComunicacao
+        +NotificadorWhatsapp(fachada: FachadaNotificacaoComunicacao)
+        +atualizar(paciente: Paciente, mensagem: String): void
+    }
+
+    class NotificadorSms implements ObservadorNotificacao {
+        -fachadaComunicacao: FachadaNotificacaoComunicacao
+        +NotificadorSms(fachada: FachadaNotificacaoComunicacao)
+        +atualizar(paciente: Paciente, mensagem: String): void
+    }
+
+    class NotificadorEmail implements ObservadorNotificacao {
+        -fachadaComunicacao: FachadaNotificacaoComunicacao
+        +NotificadorEmail(fachada: FachadaNotificacaoComunicacao)
+        +atualizar(paciente: Paciente, mensagem: String): void
+    }
+
+    class FachadaNotificacaoComunicacao <<Facade>> {
+        +FachadaNotificacaoComunicacao()
+        +enviarWhatsapp(paciente: Paciente, mensagem: String): void
+        +enviarSMS(paciente: Paciente, mensagem: String): void
+        +enviarEmail(paciente: Paciente, mensagem: String): void
+    }
+
+    ' Relações internas do Observer
+    AssuntoNotificacao "1" o-- "0..*" ObservadorNotificacao
+    NotificadorWhatsapp .right.> FachadaNotificacaoComunicacao
+    NotificadorSms .right.> FachadaNotificacaoComunicacao
+    NotificadorEmail .right.> FachadaNotificacaoComunicacao
+}
+
+' 4. Decorator Pattern: Descontos (R7)
+package "Padrão Decorator: Descontos" {
+    interface Desconto {
+        +aplicarDesconto(originalPrice: double): double
+    }
+
+    class PrecoBase implements Desconto {
+        +aplicarDesconto(originalPrice: double): double
+    }
+
+    class DescontoConvenio extends PrecoBase {
+        +aplicarDesconto(originalPrice: double): double
+    }
+
+    class DescontoIdoso extends PrecoBase {
+        +aplicarDesconto(originalPrice: double): double
+    }
+
+    class DescontoOutubroRosa extends PrecoBase {
+        +aplicarDesconto(originalPrice: double): double
+    }
+}
+
+' 5. Strategy Pattern: Prioridade de Exames (R8)
+package "Padrão Strategy: Prioridade de Exames" {
+    class FilaDePrioridade {
+        +adicionarExame(exame: Exame): void
+        +proximoExame(): Exame
+    }
+
+    interface EstrategiaPrioridade {
+        +determinarPrioridade(exame: Exame): int
+    }
+
+    class EstrategiaPrioridadeUrgente implements EstrategiaPrioridade {
+        +determinarPrioridade(exame: Exame): int
+    }
+
+    class EstrategiaPrioridadePoucoUrgente implements EstrategiaPrioridade {
+        +determinarPrioridade(exame: Exame): int
+    }
+
+    class EstrategiaPrioridadeRotina implements EstrategiaPrioridade {
+        +determinarPrioridade(exame: Exame): int
+    }
+
+    ' Relações internas da Strategy
+    FilaDePrioridade "1" o-- "1" EstrategiaPrioridade
+}
+
+' 6. State Pattern: Pagamento (R10)
+package "Padrão State: Pagamento" {
+    class ContextoPagamento {
+        -estado: EstadoPagamento
+        -valorTotal: double
+        +ContextoPagamento(valorTotal: double)
+        +setEstado(estado: EstadoPagamento): void
+        +processarPagamento(): boolean
+        +getValorTotal(): double
+        +setValorTotal(valor: double): void
+        +aplicarDescontos(descontosAplicar: List<Desconto>): void
+    }
+
+    interface EstadoPagamento {
+        +lidarPagamento(contexto: ContextoPagamento): boolean
+    }
+
+    class PagamentoPendente implements EstadoPagamento {
+        +lidarPagamento(contexto: ContextoPagamento): boolean
+    }
+
+    class PagamentoAprovado implements EstadoPagamento {
+        +lidarPagamento(contexto: ContextoPagamento): boolean
+    }
+
+    class PagamentoRecusado implements EstadoPagamento {
+        +lidarPagamento(contexto: ContextoPagamento): boolean
+    }
+
+    ' Relações internas do State
+    ContextoPagamento "1" *-- "1" EstadoPagamento
+}
+
+' 7. Façade Pattern: Orquestração do Sistema (R1, R9)
+package "Padrão Facade: Sistema Diagnóstico" {
+    class SistemaDiagnosticoFacade <<Facade>> {
+        -pacientes: List<Paciente>
+        -medicos: List<Medico>
+        -filaDePrioridade: FilaDePrioridade
+        -assuntoNotificacao: AssuntoNotificacao
+        -fachadaNotificacaoComunicacao: FachadaNotificacaoComunicacao
+        -contextoPagamento: ContextoPagamento
+        +SistemaDiagnosticoFacade()
+        +inicializarSistema(caminhoCSVCompleto: String): void
+        +registrarNovoExame(paciente: Paciente, medicoSolicitante: Medico, medicoResponsavel: Medico, data: Date, preco: double, tipoExameNome: String, formatoLaudo: FormatoLaudo, prioridade: TipoPrioridade): Exame
+        +processarProximoExameNaFila(): void
+        +gerarLaudoEValidar(exame: Exame): String
+        +processarPagamentoExame(exame: Exame, descontosAplicar: List<Desconto>): boolean
+        +notificarPaciente(paciente: Paciente, mensagem: String): void
+        +getPacientes(): List<Paciente>
+        +getMedicos(): List<Medico>
+    }
+}
+
+' 8. Cliente Principal
+package "Aplicação Cliente" {
+    class AplicacaoPrincipal <<Client>> {
+        -sistemaDiagnosticoFacade: SistemaDiagnosticoFacade
+        +main(): void
+    }
+}
+
+' ====================================================================
+' Conexões entre os Padrões e Entidades
+' ====================================================================
+
+' Exame e suas relações com entidades básicas
+Exame .up.> Paciente
+Exame .up.> Medico
+Exame .up.> ValidadorExame
+
+' Conexões da Fachada com outros padrões/componentes
+SistemaDiagnosticoFacade .right.> FilaDePrioridade
+SistemaDiagnosticoFacade .right.> AssuntoNotificacao
+SistemaDiagnosticoFacade .right.> FachadaNotificacaoComunicacao
+SistemaDiagnosticoFacade .right.> ContextoPagamento
+
+' Conexões de ContextoPagamento com Decorator
+ContextoPagamento "1" o-- "0..*" Desconto
+
+' Conexões da Fila de Prioridade
+FilaDePrioridade "1" o-- "0..*" Exame
+
+' Conexão do Cliente Principal
+AplicacaoPrincipal .down.> SistemaDiagnosticoFacade
+
+@enduml

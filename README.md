@@ -5,13 +5,41 @@
 ## 💻 Diagrama de Classes da solução inicial
 
 
+## 🖲️ Fluxo da solicitação do laudo
+
+Recebimento do exame → com dados + prioridade.
+
+Adição à fila de prioridade (PriorityQueue<ExamePrioritario>).
+
+O sistema processa a fila com base na prioridade:
+
+- URGENTE vai primeiro.
+- POUCO_URGENTE vem depois.
+- ROTINA por último.
+
+Após sair da fila:
+
+O exame é validado.
+
+Se estiver válido, é criado e emitido o laudo.
+
+O paciente é notificado.
+
+O pagamento é processado, caso tenha descontos aplica o Decorater, via State.
+- 
+
 ## 👾 Padrões de projeto utilizados
 
-- Bridge
-- Observer
-- Chain of Responsibility
-- Decorator
-- Strategy
+
+- Facade: Centralizando e simplificando o acesso a subsistemas como pagamento (State + Decorator), geração de laudos (Bridge), notificações (Observer) e validações (Chain of Responsibility), promovendo baixo acoplamento e coesão elevada.
+- Bridge: Separar tipos de laudos dos formatos de laudo (HTML, PDF, etc.).
+- Observer: Notificar paciente.
+- Chain of Responsibility: Validar exames com diferentes regras
+- Decorator: Aplicar descontos encadeáveis (idoso, convênio, campanhas).
+- State: 	Controlar estado do pagamento: pagamento pendente, pagamento aprovado e pagamento cancelado.
+- Strategy + Fila de prioridade: Definir prioridade do exame (Urgente, Pouco Urgente, Rotina).
+
+
 
 ## 🛠️ Tecnologias Utilizadas
 
