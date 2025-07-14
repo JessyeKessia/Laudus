@@ -37,7 +37,7 @@ O pagamento é processado, caso tenha descontos aplica o Decorater, via State.
 - Chain of Responsibility: Validar exames com diferentes regras
 - Decorator: Aplicar descontos encadeáveis (idoso, convênio, campanhas).
 - State: 	Controlar estado do pagamento: pagamento pendente, pagamento aprovado e pagamento cancelado.
-- Strategy + Fila de prioridade: Definir prioridade do exame (Urgente, Pouco Urgente, Rotina).
+- Strategy + Simple Factory: Definir prioridade do exame (Urgente, Pouco Urgente, Rotina).
 
 
 
