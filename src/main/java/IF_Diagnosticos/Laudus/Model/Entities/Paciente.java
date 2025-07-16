@@ -4,7 +4,7 @@ public class Paciente {
     private String nome;
     private String convenio;
 
-    public Paciente(String nome, String convenio, String medicoSolicitante) {
+    public Paciente(String nome, String convenio) {
         this.nome = nome;
         this.convenio = convenio;
     }

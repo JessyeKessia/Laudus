@@ -11,7 +11,7 @@ public class FormatoPDF implements FormatoLaudo {
             Document doc = new Document();
             PdfWriter.getInstance(doc, new FileOutputStream(nomeArquivo + ".pdf"));
             doc.open();
-            doc.add(new Paragraph("ST Diagnósticos", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16)));
+            doc.add(new Paragraph("IF Diagnósticos", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16)));
             doc.add(new Paragraph(cabecalho));
             doc.add(new Paragraph("\n" + corpo));
             doc.add(new Paragraph("\n" + rodape, FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE)));
