@@ -1,4 +1,4 @@
-package IF_Diagnosticos.Laudus.Model.FormatoLaudo;
+package IF_Diagnosticos.Laudus.formatoLaudo;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;

@@ -1,9 +1,9 @@
-package IF_Diagnosticos.Laudus.Model.Entities;
+package IF_Diagnosticos.Laudus.Model.entities;
+import IF_Diagnosticos.Laudus.utils.UniqueIdGenerator;
 import java.time.LocalDate;
 
 public class Exame {
-    private static int sequencialGlobal = 1;
-    private int id;
+    private String numeroIdentificacao;
     private String resultados;
     private String especialidade;
     private Paciente paciente;
@@ -20,9 +20,10 @@ public class Exame {
         this.especialidade = especialidade;
         this.resultados = resultados;
         this.data = LocalDate.now();
-        this.id = sequencialGlobal++;
+        this.numeroIdentificacao = UniqueIdGenerator.getInstance().generateNextId();;
     }
 
+    public String getNumeroIdentificacao() { return numeroIdentificacao; };
     public Paciente getPaciente() { return paciente; }
     public Medico getMedicoSolicitante() { return medicoSolicitante; }
     public String getTipo() { return tipo; }
@@ -31,7 +32,7 @@ public class Exame {
     public String getResultados() { return resultados; }
 
     public String getCabecalho() {
-        return "Exame Nº: " + id + "\n" +
+        return "Exame Nº: " + numeroIdentificacao + "\n" +
                 "Paciente: " + paciente.getNome() + "\n" +
                 "Convênio: " + (paciente.getConvenio()) + "\n" +
                 "Médico Solicitante: " + medicoSolicitante.getNome() + "\n" +
@@ -41,6 +42,7 @@ public class Exame {
     public Medico getMedicoResponsavel() {
         return medicoResponsavel;
     }
+
 
     public void setEspecialidade(String especialidade) {
         this.especialidade = especialidade;

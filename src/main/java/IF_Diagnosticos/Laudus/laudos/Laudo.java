@@ -1,9 +1,9 @@
-package IF_Diagnosticos.Laudus.Model.Laudos;
+package IF_Diagnosticos.Laudus.laudos;
 
-import IF_Diagnosticos.Laudus.Model.Entities.Medico;
-import IF_Diagnosticos.Laudus.Model.Entities.Paciente;
-import IF_Diagnosticos.Laudus.Model.FormatoLaudo.FormatoLaudo;
-import IF_Diagnosticos.Laudus.Model.Entities.Exame;
+import IF_Diagnosticos.Laudus.Model.entities.Medico;
+import IF_Diagnosticos.Laudus.Model.entities.Paciente;
+import IF_Diagnosticos.Laudus.formatoLaudo.FormatoLaudo;
+import IF_Diagnosticos.Laudus.Model.entities.Exame;
 
 import java.time.LocalDate;
 
@@ -19,7 +19,7 @@ public abstract class Laudo {
         String nomeArquivo = gerarNomeArquivo(exame.getPaciente(), exame);
         String cabecalho = exame.getCabecalho();
         String corpo = gerarCorpo(exame);
-        String rodape = "Médico Responsável: " + laudista.getAssinatura();
+        String rodape = "Médico Responsável: " + laudista.getNome() + " " + laudista.getCrm();
         formato.gerarLaudo(cabecalho, corpo, rodape, nomeArquivo);
     }
 

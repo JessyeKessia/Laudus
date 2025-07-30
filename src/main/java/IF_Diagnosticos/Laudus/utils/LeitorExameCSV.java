@@ -1,8 +1,8 @@
-package IF_Diagnosticos.Laudus.Utils;
+package IF_Diagnosticos.Laudus.utils;
 
-import IF_Diagnosticos.Laudus.Model.Entities.Exame;
-import IF_Diagnosticos.Laudus.Model.Entities.Medico;
-import IF_Diagnosticos.Laudus.Model.Entities.Paciente;
+import IF_Diagnosticos.Laudus.Model.entities.Exame;
+import IF_Diagnosticos.Laudus.Model.entities.Medico;
+import IF_Diagnosticos.Laudus.Model.entities.Paciente;
 
 import com.opencsv.CSVReader;
 import java.io.FileReader;

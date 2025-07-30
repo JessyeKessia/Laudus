@@ -1,4 +1,4 @@
-package IF_Diagnosticos.Laudus.Model.Entities;
+package IF_Diagnosticos.Laudus.Model.entities;
 
 public class Medico {
     private String crm;
@@ -9,12 +9,11 @@ public class Medico {
         this.crm = crm;
     }
 
-    // Getters necessarios
-    public String getAssinatura() {
-        return "(" + nome + " " +  crm + ")";
-    }
-
     public String getNome() {
         return nome;
     }
+    public String getCrm() { return crm; }
+
+    public void setNome(String nome) { this.nome = nome; }
+    public void setCrm(String crm) { this.crm = crm; }
 }

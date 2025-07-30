@@ -1,4 +1,4 @@
-package IF_Diagnosticos.Laudus.Model.FormatoLaudo;
+package IF_Diagnosticos.Laudus.formatoLaudo;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

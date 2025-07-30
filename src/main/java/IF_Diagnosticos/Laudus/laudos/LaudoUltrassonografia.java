@@ -1,7 +1,7 @@
-package IF_Diagnosticos.Laudus.Model.Laudos;
+package IF_Diagnosticos.Laudus.laudos;
 
-import IF_Diagnosticos.Laudus.Model.Entities.Exame;
-import IF_Diagnosticos.Laudus.Model.FormatoLaudo.FormatoLaudo;
+import IF_Diagnosticos.Laudus.Model.entities.Exame;
+import IF_Diagnosticos.Laudus.formatoLaudo.FormatoLaudo;
 
 public class LaudoUltrassonografia extends Laudo{
     public LaudoUltrassonografia(FormatoLaudo formato) {
