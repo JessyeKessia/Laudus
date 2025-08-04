@@ -1,6 +1,7 @@
 package IF_Diagnosticos.Laudus.Model.Notificacao;
 
 import IF_Diagnosticos.Laudus.Model.Entities.Paciente;
+import IF_Diagnosticos.Laudus.Model.Facate.FachadaNotificacaoComunicacao;
 
 public class NotificadorEmail implements ObservadorNotificacao {
     private FachadaNotificacaoComunicacao fachadaComunicacao;
