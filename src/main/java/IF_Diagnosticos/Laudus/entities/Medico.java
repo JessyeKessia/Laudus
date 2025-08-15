@@ -1,8 +1,8 @@
-package IF_Diagnosticos.Laudus.Model.entities;
+package IF_Diagnosticos.Laudus.entities;
 
 public class Medico {
-    private String crm;
     private String nome;
+    private String crm;
 
     public Medico(String nome, String crm) {
         this.nome = nome;

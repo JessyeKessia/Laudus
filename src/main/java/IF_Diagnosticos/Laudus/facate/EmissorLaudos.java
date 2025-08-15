@@ -1,23 +1,20 @@
 package IF_Diagnosticos.Laudus.facade;
 
-import IF_Diagnosticos.Laudus.Model.entities.Exame;
-import IF_Diagnosticos.Laudus.formatoLaudo.FormatoLaudo;
-import IF_Diagnosticos.Laudus.formatoLaudo.FormatoPDF;
-import IF_Diagnosticos.Laudus.formatoLaudo.FormatoHTML;
-import IF_Diagnosticos.Laudus.formatoLaudo.FormatoTexto;
-import IF_Diagnosticos.Laudus.laudos.LaudoHemograma;
-import IF_Diagnosticos.Laudus.laudos.LaudoRessonancia;
-import IF_Diagnosticos.Laudus.laudos.LaudoUltrassonografia;
-import IF_Diagnosticos.Laudus.laudos.Laudo;
+import IF_Diagnosticos.Laudus.exames.Exame;
+import IF_Diagnosticos.Laudus.laudos.FormatoLaudo;
+import IF_Diagnosticos.Laudus.laudos.FormatoPDF;
+import IF_Diagnosticos.Laudus.laudos.FormatoHTML;
+import IF_Diagnosticos.Laudus.laudos.FormatoTexto;
+import IF_Diagnosticos.Laudus.exames.ExameSanguineo;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EmissorLaudosFacade {
+public class EmissorLaudos {
     private List<Exame> examesCarregados;
 
-    public EmissorLaudosFacade(List<Exame> examesCarregados) {
+    public EmissorLaudos(List<Exame> examesCarregados) {
         this.examesCarregados = examesCarregados;
     }
 
@@ -42,10 +39,10 @@ public class EmissorLaudosFacade {
         for (Exame exame : examesDoPaciente) {
             System.out.println("Processando Exame Nº " + exame.getNumeroIdentificacao() + " (" + exame.getTipo() + ")");
 
-            Laudo laudo = switch (exame.getTipo().toLowerCase()) {
+            FormatoLaudo laudo = switch (exame.getTipo().toLowerCase()) {
                 case "hemograma" -> new LaudoHemograma(formatoEscolhido);
                 case "ultrassonografia abdominal" -> new LaudoUltrassonografia(formatoEscolhido);
-                case "ressonância magnética joelho" -> new LaudoRessonancia(formatoEscolhido);
+                case "ressonância magnética joelho" -> new ExameSanguineo(formatoEscolhido);
                 case "exame de urina" -> new LaudoHemograma(formatoEscolhido);
                 default -> throw new IllegalArgumentException("Tipo de exame não suportado: " + exame.getTipo());
             };

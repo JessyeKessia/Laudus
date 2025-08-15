@@ -1,4 +1,6 @@
-package IF_Diagnosticos.Laudus.Model.entities;
+package IF_Diagnosticos.Laudus.entities;
+
+import java.util.Date;
 
 public class Paciente {
     private String nome;
@@ -8,6 +10,7 @@ public class Paciente {
     public Paciente(String nome, String convenio) {
         this.nome = nome;
         this.convenio = convenio;
+        // this.dataNascimento = dataNascimento;
        // this.email = email;
     }
     public String getNome() {
