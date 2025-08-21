@@ -1,22 +1,17 @@
 package IF_Diagnosticos.Laudus.validadores;
-import IF_Diagnosticos.Laudus.exames.Exame;
 
-public abstract class ValidadorBase implements Validador {
-    protected Validador proximo;
+public abstract class ValidadorBase implements ValidadorSanguineo {
+    protected ValidadorSanguineo proximo;
 
-    public void setProximo(Validador proximo) {
+    public void setProximo(ValidadorSanguineo proximo) {
         this.proximo = proximo;
     }
 
-    public void handle(Exame exame) throws Exception {
-        if (!validar(exame)) {
-            throw new Exception("Exame inválido: " + exame.getTipo());
-        }
+    public String handle(Laudo exame) {
         if (proximo != null) {
-            proximo.handle(exame); // passa para o próximo validador
+            return proximo.handle(exame);
         }
+        // último da cadeia: pode retornar vazio ou lançar exceção
+        return "Sem validador aplicável para o tipo: " + exame.getTipo();
     }
-
-    // cada validador concreto implementa sua regra
-    protected abstract boolean validar(Exame exame);
 }

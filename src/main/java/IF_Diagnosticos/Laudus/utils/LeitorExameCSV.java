@@ -1,53 +1,34 @@
 //package IF_Diagnosticos.Laudus.utils;
 //
-//import IF_Diagnosticos.Laudus.exames.Exame;
-//import IF_Diagnosticos.Laudus.Model.entities.Medico;
-//import IF_Diagnosticos.Laudus.Model.entities.Paciente;
+//import java.io.FileWriter;
+//import java.io.IOException;
 //
-//import com.opencsv.CSVReader;
-//import java.io.FileReader;
-//import java.util.ArrayList;
-//import java.util.List;
+//public class CadastroPaciente {
 //
-//public class LeitorExameCSV {
-//    public static List<Exame> ler(String caminhoCSV) {
-//        List<Exame> exames = new ArrayList<>();
-//        System.out.println(" oi leu");
+//    // Caminho fixo do CSV que será usado sempre
+//    private static final String ARQUIVO_CSV = "exames.csv";
 //
-//        try (CSVReader reader = new CSVReader(new FileReader(caminhoCSV))) {
-//            String[] linha;
-//            reader.readNext(); // pula cabeçalho
-//            System.out.println(" oi leu22");
+//    public static void cadastrarPaciente(String nome, int idade, String cpf, String email) {
+//        try (FileWriter writer = new FileWriter(ARQUIVO_CSV, true)) {
+//            // Formato CSV: nome,idade,cpf,email
+//            writer.append(nome)
+//                    .append(",")
+//                    .append(String.valueOf(idade))
+//                    .append(",")
+//                    .append(cpf)
+//                    .append(",")
+//                    .append(email)
+//                    .append("\n");
 //
-//            while ((linha = reader.readNext()) != null) {
-//                if (linha.length < 9) continue;
-//                System.out.println(" oi leu33");
-//
-//                String nomePaciente = linha[0].trim();
-//                System.out.println(linha[0].trim());
-//                String convenio = linha[1].trim();
-//                String nomeSolicitante = linha[2].trim();
-//                String crnSolicitante = linha[3].trim();
-//                String nomeResponsavel = linha[4].trim();
-//                String crnResponsavel = linha[5].trim();
-//                String tipoExame = linha[6].trim();
-//                String especialidade = linha[7].trim();
-//                String resultados = linha[8].trim();
-//
-//                Paciente paciente = new Paciente(nomePaciente, convenio);
-//                Medico solicitante = new Medico(nomeSolicitante, crnSolicitante);
-//                Medico responsavel = new Medico(nomeResponsavel, crnResponsavel);
-//
-//                Exame exame = new Exame(paciente, solicitante, responsavel, tipoExame, resultados, especialidade);
-//                exame.setEspecialidade(especialidade);
-//
-//                exames.add(exame);
-//            }
-//        } catch (Exception e) {
-//            System.err.println("Erro ao ler o CSV de exames:");
-//            e.printStackTrace();
+//            System.out.println("Paciente cadastrado com sucesso!");
+//        } catch (IOException e) {
+//            System.out.println("Erro ao salvar paciente: " + e.getMessage());
 //        }
+//    }
 //
-//        return exames;
+//    public static void main(String[] args) {
+//        // Exemplo de uso
+//        cadastrarPaciente("Maria Silva", 28, "123.456.789-00", "maria@email.com");
+//        cadastrarPaciente("João Souza", 35, "987.654.321-00", "joao@email.com");
 //    }
 //}

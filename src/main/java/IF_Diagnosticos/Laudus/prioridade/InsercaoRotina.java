@@ -1,6 +1,6 @@
 package IF_Diagnosticos.Laudus.prioridade;
 
-import IF_Diagnosticos.Laudus.exames.Exame;
+import IF_Diagnosticos.Laudus.brigde.Exame;
 
 import java.util.Deque;
 
