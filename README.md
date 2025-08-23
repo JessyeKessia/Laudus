@@ -30,10 +30,10 @@ O pagamento é processado, caso tenha descontos aplica o Decorater, via State.
 
 ## 👾 Padrões de projeto utilizados
 
-
-- Facade: Centralizando e simplificando o acesso a subsistemas como pagamento (State + Decorator), geração de laudos (Bridge), notificações (Observer) e validações (Chain of Responsibility), promovendo baixo acoplamento e coesão elevada.
+- Factory: fazer a criação dos exames;
+- Facade: Centralizando e simplificando o acesso
 - Bridge: Separar tipos de laudos dos formatos de laudo (HTML, PDF, etc.).
-- Observer: Notificar paciente.
+- Observer: Notificar paciente por e-mail.
 - Chain of Responsibility: Validar exames com diferentes regras
 - Decorator: Aplicar descontos encadeáveis (idoso, convênio, campanhas).
 - State: 	Controlar estado do pagamento: pagamento pendente, pagamento aprovado e pagamento cancelado.

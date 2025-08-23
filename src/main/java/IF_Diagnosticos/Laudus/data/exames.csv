@@ -1,0 +1,5 @@
+paciente,convenio,dataNascimento,email,telefone,medicoSolicitante,crmSolicitante,medicoResponsavel,crmResponsavel,tipoExame,subtipo,resultados
+Maria Silva,Unimed,1990-05-20,maria.silva@email.com,11999999999,Dr. Renato Santos,CRM/PB 1234,Dra. Beatriz Lima,CRM/PB 9999,Hemograma,Eritrograma,13.5 g/dL;
+João Souza,Hapvida,1985-11-10,joao.souza@email.com,83988887777,Dra. Paula Mendes,CRM/PB 2345Dr. Fábio Souza,CRM/PB 8888,Imagem,Abdominal,
+Ana Lima,Bradesco,1992-03-15,ana.lima@email.com,21977776666,Dr. Renato Santos,CRM/PB 1234,Dra. Beatriz Lima,CRM/PB 9999,Imagem,Joelho,
+Carlos Andrade,Unimed,1978-07-02,carlos.andrade@email.com,11966665555,Dr. Renato Santos,CRM/PB 1234,Dra. Beatriz Lima,CRM/PB 9999,
