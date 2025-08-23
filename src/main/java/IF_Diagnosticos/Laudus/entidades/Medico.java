@@ -1,4 +1,4 @@
-package IF_Diagnosticos.Laudus.entities;
+package IF_Diagnosticos.Laudus.entidades;
 
 public class Medico {
     private String nome;

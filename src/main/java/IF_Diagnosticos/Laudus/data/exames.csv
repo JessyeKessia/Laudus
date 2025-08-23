@@ -1,5 +1,5 @@
-paciente,convenio, medicoSolicitante,crmSolicitante,medicoResponsavel,crmResponsavel,tipoExame, especialidade, resultados
-Maria Silva,Unimed, Dr. Renato Santos,CRM/PB 1234,Dra. Beatriz Lima,CRM/PB 9999,Hemograma, eritograma, "Hemoglobina: 13.5 g/dL; Hematócrito: 40%; Leucócitos: 7.000/mm³; Plaquetas: 250.000/mm³"
-João Souza,, Hapvida, Dra. Paula Mendes,CRM/PB 2345,Dr. Fábio Souza,CRM/PB 8888,Ultrassonografia, Abdominal,"Fígado: sem cálculos; Observações: sem alterações significativas"
-Ana Lima,Bradesco, Dr. Renato Santos,CRM/PB 1234,Dra. Beatriz Lima,CRM/PB 9999,Ressonância, Joelho,"Menisco medial: sinais de degeneração; Derrame articular: pequeno volume; Ligamentos: sem alterações visíveis"
-Carlos Andrade,Unimed, Dr. Renato Santos,CRM/PB 1234,Dra. Beatriz Lima,CRM/PB 9999,Hemograma, eritograma, "Hemoglobina: 12.1 g/dL; Hematócrito: 38%; Leucócitos: 6.500/mm³; Plaquetas: 230.000/mm³"
+paciente,convenio,dataNascimento,email,telefone,medicoSolicitante,crmSolicitante,medicoResponsavel,crmResponsavel,tipoExame,subtipo,resultados
+Maria Silva,Unimed,1990-05-20,maria.silva@email.com,11999999999,Dr. Renato Santos,CRM/PB 1234,Dra. Beatriz Lima,CRM/PB 9999,Hemograma,Eritrograma,13.5 g/dL;
+João Souza,Hapvida,1985-11-10,joao.souza@email.com,83988887777,Dra. Paula Mendes,CRM/PB 2345Dr. Fábio Souza,CRM/PB 8888,Imagem,Abdominal,
+Ana Lima,Bradesco,1992-03-15,ana.lima@email.com,21977776666,Dr. Renato Santos,CRM/PB 1234,Dra. Beatriz Lima,CRM/PB 9999,Imagem,Joelho,
+Carlos Andrade,Unimed,1978-07-02,carlos.andrade@email.com,11966665555,Dr. Renato Santos,CRM/PB 1234,Dra. Beatriz Lima,CRM/PB 9999,

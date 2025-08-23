@@ -1,59 +1,42 @@
 package IF_Diagnosticos.Laudus.facade;
 
-import IF_Diagnosticos.Laudus.entities.Convenio;
-import IF_Diagnosticos.Laudus.entities.Medico;
-import IF_Diagnosticos.Laudus.entities.Paciente;
-import IF_Diagnosticos.Laudus.brigde.Exame;
+import IF_Diagnosticos.Laudus.bridge.Exame;
 import IF_Diagnosticos.Laudus.prioridade.FilaPrioridade;
-import IF_Diagnosticos.Laudus.prioridade.Prioridade;
-import IF_Diagnosticos.Laudus.validadores.ValidadorSanguineo;
+
 
 public class SistemaDiagnosticoFacade {
-    private ValidadorSanguineo validadorAutomatico;
-    private ExameSanguineoFactory criadorExame;
+    private ValidadorExame validador;
     private FilaPrioridade gerenciadorFila;
 
-    public SistemaDiagnosticoFacade(ExameSanguineoFactory criadorExame, FilaPrioridade gerenciadorFila, ValidadorSanguineo validadorAutomatico) {
-        this.criadorExame = criadorExame;
+    public SistemaDiagnosticoFacade(FilaPrioridade gerenciadorFila, ValidadorExame validador) {
         this.gerenciadorFila = gerenciadorFila;
-        this.validadorAutomatico = validadorAutomatico;
+        this.validador = validador;
     }
 
-    public void processaPedidoLaudo(String tipoExame, String nomeExame, double valorExame, String unidadeExame,
-                                    Prioridade prioridade, String formatoLaudo, Paciente paciente,
-                                    Medico medicoSolicitante, Convenio convenio) {
+    public void processaPedidoLaudo(Exame exame) {
 
-        // Etapa 1: Criação do Exame (Simple Factory)
-        Exame exame = criadorExame.criarExame(tipoExame, nomeExame, valorExame, unidadeExame, prioridade);
+        // Etapa 1: Estágio de pagamento com a aplicação de descontos
 
-        // Etapa 2: Adição à fila (Prioridade)
+        // Etapa 2: Adição à fila (Prioridade: Strategy + fila liked + Simple Factory)
         gerenciadorFila.adicionarExame(exame);
+        System.out.println("Exame adicionado na fila: " + exame.getTipo());
 
-        // Etapa 3: Processamento do exame e obtenção do conteúdo
-        Exame exameProcessado = this.gerenciadorFila.proximoExame();
-        String conteudoLaudo;
-        if (exameProcessado instanceof ExameSanguineo) {
-            conteudoLaudo = validadorAutomatico.processar(exameProcessado);
-        } else {
-            // Em uma aplicação real, aqui haveria a chamada para a interface do médico.
-            conteudoLaudo = "Laudo de exame de imagem (texto simulado).";
-        }
+        // Etapa 3: Processamento do exame (Chama o o próximo exame da fila)
+        Exame exameProcessado = this.gerenciadorFila.processarProximo();
 
-        // Etapa 4: Geração do Laudo Final (Bridge)
-        FormatoLaudo formato;
-        if ("Texto".equalsIgnoreCase(formatoLaudo)) {
-            formato = new FormatoTexto();
-        } else if ("HTML".equalsIgnoreCase(formatoLaudo)) {
-            formato = new FormatoHTML();
-        } else {
-            formato = new FormatoPDF();
-        }
+        // Etapa 4: Obtenção do conteúdo do exame validado (Validadores com chain)
+        String conteudo = validador.validar(exameProcessado);
 
-        Laudo laudo = new Laudo(formato);
-        laudo.definirDados(paciente, medicoSolicitante, convenio);
-        laudo.definirConteudo(conteudoLaudo);
+        // Etapa 5: Geração do Laudo Final
+        // Pergunta quem foi o médico responsável que deu o laudo (NÃO PODE SER VAZIO)
+        // Se for de imagem vai pedir a descrição que será o conteudo, senão já entre automático aqui como conteudo
+        // Envia o exame.
+        EmissorLaudo.emitirLaudo(exameProcessado);
 
-        return laudo.gerarLaudo();
+        // Etapa 6: Notifica por email ou por telefone
+        // Pega o número de telefone e o email que o paciente forneceu e notifica que o laudo já foi impresso e está disponivel
+
+
         }
     }
 }

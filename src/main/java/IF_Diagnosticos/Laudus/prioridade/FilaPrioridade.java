@@ -1,6 +1,6 @@
 package IF_Diagnosticos.Laudus.prioridade;
 
-import IF_Diagnosticos.Laudus.brigde.Exame;
+import IF_Diagnosticos.Laudus.bridge.Exame;
 
 import java.util.ArrayList;
 import java.util.Deque;

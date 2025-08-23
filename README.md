@@ -30,7 +30,7 @@ O pagamento é processado, caso tenha descontos aplica o Decorater, via State.
 
 ## 👾 Padrões de projeto utilizados
 
-
+- Factory: fazer a criação dos exames;
 - Facade: Centralizando e simplificando o acesso
 - Bridge: Separar tipos de laudos dos formatos de laudo (HTML, PDF, etc.).
 - Observer: Notificar paciente por e-mail.

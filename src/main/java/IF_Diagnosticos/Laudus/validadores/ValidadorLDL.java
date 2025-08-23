@@ -1,10 +1,12 @@
 package IF_Diagnosticos.Laudus.validadores;
 
+import IF_Diagnosticos.Laudus.factory.ExameLaborial;
+
 public class ValidadorLDL extends ValidadorBase {
-    public String handle(Laudo exame) {
-        String tipo = exame.getTipo();
+    public String handle(ExameLaborial exame) {
+        String tipo = exame.getEspecialidade();
         if (tipo != null && tipo.equalsIgnoreCase("LDL")) {
-            return "Colesterol LDL: " + exame.getDadosResultantes() + " mg/dL\n" +
+            return "Colesterol LDL: " + exame.getValor() + " mg/dL\n" +
                     "Valores de Referência:\n" +
                     "Desejável: < 100 mg/dL\n" +
                     "Limítrofe: 100 – 129 mg/dL\n" +
