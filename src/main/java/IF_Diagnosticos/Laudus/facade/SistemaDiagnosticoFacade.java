@@ -56,7 +56,7 @@ public class SistemaDiagnosticoFacade {
 
         // --- ETAPA 5: NOTIFICAÇÃO ---
         if (laudoPdf != null && laudoPdf.exists()) {
-            String mensagem = "Seu laudo (" + exam.getTipo() + ") foi emitido com sucesso e segue em anexo.";
+            String mensagem = "Seu laudo (" + exam.getTipo() + ") foi emitido com sucesso e segue em anexo para seu email.";
             assunto.notificar(exam.getPaciente(), mensagem, laudoPdf);
         } else {
             String mensagemDeErro = "Seu laudo (" + exam.getTipo() + ") foi processado, mas houve um erro ao gerar o arquivo PDF. Por favor, entre em contato com a clínica.";

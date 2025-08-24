@@ -5,7 +5,6 @@ import jakarta.mail.MessagingException;
 
 import java.io.File;
 import java.io.IOException;
-// ... outros imports de Telegram
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -13,12 +12,13 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
-
 public class FachadaNotificacaoComunicacao {
 
     private final EmailSender emailSender;
-    // ... Credenciais do Telegram
     
+    private final String TELEGRAM_BOT_TOKEN = "8304980994:AAGwHJ-hfIe6Ftczyqogel6SpCBqxKJA7L0";
+    private final String TELEGRAM_CHAT_ID = "6953556522";
+
     public FachadaNotificacaoComunicacao(EmailSender emailSender) {
         this.emailSender = emailSender;
     }
@@ -40,6 +40,38 @@ public class FachadaNotificacaoComunicacao {
     }
     
     public void enviarTelegram(Paciente paciente, String mensagem) {
-        // ... sua implementação de enviarTelegram continua a mesma
+        try {
+            String texto = "Olá " + paciente.getNome() + ",\n" + mensagem;
+            String encodedMessage = URLEncoder.encode(texto, StandardCharsets.UTF_8.toString());
+
+            String urlString = String.format(
+                "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s",
+                TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, encodedMessage
+            );
+
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                System.out.println("[TELEGRAM] Mensagem enviada com sucesso para: " + paciente.getNome());
+            } else {
+                InputStream errorStream = conn.getErrorStream();
+                String responseBody = "N/A";
+                if (errorStream != null) {
+                    try (Scanner scanner = new Scanner(errorStream)) {
+                        responseBody = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                    }
+                }
+                System.err.println("❌ Erro ao enviar Telegram para " + paciente.getNome() + ". Código HTTP: " + responseCode + ". Resposta: " + responseBody);
+            }
+            conn.disconnect();
+        } catch (Exception e) {
+            System.err.println("❌ Exceção ao tentar enviar Telegram para " + paciente.getNome());
+            e.printStackTrace();
+        }
     }
 }
