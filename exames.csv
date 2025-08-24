@@ -1,5 +1,8 @@
-paciente,convenio,dataNascimento,email,telefone,medicoSolicitante,crmSolicitante,medicoResponsavel,crmResponsavel,tipoExame,subtipo,resultados
-Maria Silva,Unimed,1990-05-20,maria.silva@email.com,11999999999,Dr. Renato Santos,CRM/PB 1234,Dra. Beatriz Lima,CRM/PB 9999,Hemograma,Eritrograma,13.5 g/dL;
-João Souza,Hapvida,1985-11-10,joao.souza@email.com,83988887777,Dra. Paula Mendes,CRM/PB 2345Dr. Fábio Souza,CRM/PB 8888,Imagem,Abdominal,
-Ana Lima,Bradesco,1992-03-15,ana.lima@email.com,21977776666,Dr. Renato Santos,CRM/PB 1234,Dra. Beatriz Lima,CRM/PB 9999,Imagem,Joelho,
-Carlos Andrade,Unimed,1978-07-02,carlos.andrade@email.com,11966665555,Dr. Renato Santos,CRM/PB 1234,Dra. Beatriz Lima,CRM/PB 9999,Hemograma,,12.1 g/dL;
+Carlos Pereira,Unimed,1955-01-15,carlos.pereira@email.com,83981474946,Dr. Renato Santos,CRM/PB 1234,Raio-X,Tórax,,false,,,,
+Juliana Costa,Hapvida,1998-08-22,juliana.costa@email.com,83981474946,Dra. Paula Mendes,CRM/PB 2345,Glicose,,95 mg/dL,,,,,,
+Roberto Almeida,Bradesco,1960-04-30,roberto.almeida@email.com,83981474946,Dr. Fábio Souza,CRM/PB 8888,Ressonância,Crânio,,false,,,true,false
+Fernanda Lima,SulAmérica,1989-02-18,fernanda.lima@email.com,83981474946,Dr. Fábio Souza,CRM/PB 8888,Ressonância,Joelho D,,true,Gadolínio,15.0,false,false
+Lucas Martins,,2001-12-05,lucas.martins@email.com,83981474946,Dra. Paula Mendes,CRM/PB 2345,Hemograma,Completo,4.5 milhões/µL,,,,,,
+Sonia Braga,,1958-06-07,sonia.braga@email.com,83981474946,Dr. Renato Santos,CRM/PB 1234,Raio-X,Mamografia,,false,,,,
+Pedro Oliveira,Unimed,1975-09-14,pedroguudi.oliveiradiator@email.com,83981474946,Dra. Paula Mendes,CRM/PB 2345,Colesterol,,250 mg/dL,,,,,,
+Beatriz Santos,Hapvida,1995-03-25,beatriz.santos@email.com,83981474946,Dr. Fábio Souza,CRM/PB 8888,Ressonância,Coluna Lombar,,false,,,false,true
