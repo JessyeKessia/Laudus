@@ -4,12 +4,22 @@ import IF_Diagnosticos.Laudus.desconto.DescontoConvenioFactory;
 import IF_Diagnosticos.Laudus.desconto.ExameDescontoIdoso;
 import IF_Diagnosticos.Laudus.desconto.ExameDescontoOutubroRosa;
 import IF_Diagnosticos.Laudus.factory.Exame;
-import IF_Diagnosticos.Laudus.pagamento.*;
+import IF_Diagnosticos.Laudus.factory.ExameLaboratorial;
+import IF_Diagnosticos.Laudus.pagamento.ContextoPagamento;
 
 public class Pagamento {
 
     public boolean processarPagamento(Exame exame, boolean aplicarOutubroRosa) {
         System.out.println("\n--- INICIANDO PROCESSAMENTO DE PAGAMENTO PARA: " + exame.getPaciente().getNome() + " ---");
+
+        // CORREÇÃO CRÍTICA: Validação dos dados de entrada ANTES do pagamento.
+        // Se for um exame laboratorial, verificamos se o resultado médico é válido (não negativo).
+        if (exame instanceof ExameLaboratorial lab && lab.getValorMedido() < 0) {
+            System.out.println("❌ ERRO: O resultado do exame (" + lab.getValorMedido() + ") é inválido. Pagamento não pode ser processado.");
+            System.out.println("--- FIM DO PROCESSAMENTO DE PAGAMENTO ---");
+            return false; // Retorna 'false' e a fachada irá interromper o processo.
+        }
+
         System.out.println("Valor base do exame (" + exame.getTipo() + "): R$ " + String.format("%.2f", exame.getValorBase()));
 
         // 1. Aplica descontos via Decorator
