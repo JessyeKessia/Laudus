@@ -1,4 +1,3 @@
-
 package IF_Diagnosticos.Laudus.main;
 
 import java.io.File;
@@ -16,19 +15,23 @@ import IF_Diagnosticos.Laudus.utils.LeitorCSV;
 
 public class Cliente {
 
-    private static double parseValor(String raw){
+    private static double parseValor(String raw) {
         if (raw == null) return 0.0;
         raw = raw.replace(',', '.'); // decimal
         int i = 0;
         StringBuilder num = new StringBuilder();
         while (i < raw.length()) {
             char c = raw.charAt(i);
-            if ((c >= '0' && c <= '9') || c == '.' || (c=='-' && num.length()==0)) {
+            if ((c >= '0' && c <= '9') || c == '.' || (c == '-' && num.length() == 0)) {
                 num.append(c);
             } else if (num.length() > 0) break;
             i++;
         }
-        try { return Double.parseDouble(num.toString()); } catch(Exception e){ return 0.0; }
+        try {
+            return Double.parseDouble(num.toString());
+        } catch (Exception e) {
+            return 0.0;
+        }
     }
 
     public static void main(String[] args) {
@@ -38,19 +41,34 @@ public class Cliente {
             return;
         }
 
-        // Infra
+        // --- Configuração da Infraestrutura (Injeção de Dependência Manual) ---
+
+        // 1. Criar a dependência de baixo nível: EmailSender
+        // ATENÇÃO: Use uma "Senha de App" para o Gmail.
+        EmailSender emailSender = new EmailSender(
+            "nillocoelho@gmail.com",       // Usuário
+            "mtvm nvgc ryol tfmx",          // Senha de App
+            "smtp.gmail.com",              // Host SMTP
+            587                            // Porta TLS
+        );
+
+        // 2. Injetar a dependência (EmailSender) na classe que a utiliza (Fachada)
+        FachadaNotificacaoComunicacao fachadaCom = new FachadaNotificacaoComunicacao(emailSender);
+
+        // 3. Configurar o padrão Observer com a fachada já pronta.
+        AssuntoNotificacao assunto = new AssuntoNotificacao();
+        assunto.adicionarObservador(new NotificadorEmail(fachadaCom));
+        assunto.adicionarObservador(new NotificadorTelegram(fachadaCom));
+
+        // 4. Montar a Fachada Principal do Sistema.
         ValidadorExame validador = new ValidadorExame();
         FilaPrioridade fila = new FilaPrioridade();
         EmissorLaudo emissor = new EmissorLaudo();
-        AssuntoNotificacao assunto = new AssuntoNotificacao();
-        FachadaNotificacaoComunicacao fachadaCom = new FachadaNotificacaoComunicacao();
-        assunto.adicionarObservador(new NotificadorEmail(fachadaCom));
-        assunto.adicionarObservador(new NotificadorTelegram(fachadaCom));
         Pagamento pagamento = new Pagamento();
-        EmailSender emailSender = new EmailSender();
-        SistemaDiagnosticoFacade sistema = new SistemaDiagnosticoFacade(validador, fila, emissor, assunto, pagamento, emailSender);
+        
+        SistemaDiagnosticoFacade sistema = new SistemaDiagnosticoFacade(validador, fila, emissor, assunto, pagamento);
 
-    
+        // --- Leitura e Processamento dos Dados do CSV ---
         LeitorCSV leitor = new LeitorCSV(caminho);
         List<String[]> linhas = leitor.lerLinhas();
 
@@ -58,8 +76,9 @@ public class Cliente {
         boolean outubro = LocalDate.now().getMonthValue() == 10;
 
         for (String[] col : linhas) {
-
             if (col.length < 12) continue;
+            
+            // ... (o restante do seu loop 'for' para ler e processar o CSV continua exatamente igual)
             String nome = col[0];
             String convenio = col[1];
             LocalDate dataNasc = LocalDate.parse(col[2], f);
@@ -69,18 +88,16 @@ public class Cliente {
 
             Medico medicoSolic = new Medico(col[5], col[6]);
 
-            String tipoExame = col[7]; // indexação ajustada
-            String subtipo = col[8];   // indexação ajustada
-            String resultados = col[9]; // indexação ajustada
+            String tipoExame = col[7];
+            String subtipo = col[8];
+            String resultados = col[9];
 
             Prioridade prioridade = paciente.isIdoso() ? Prioridade.POUCO_URGENTE : Prioridade.ROTINA;
 
             Exame exame;
             if ("Raio-X".equalsIgnoreCase(tipoExame)) {
-                // Exame Raio-X: regiao = subtipo, imagem = resultados
                 exame = ExameSimpleFactory.criarExameRaioX(paciente, medicoSolic, prioridade, subtipo, resultados);
             } else if ("Ressonância".equalsIgnoreCase(tipoExame)) {
-                // Exame Ressonância: regiao = subtipo, demais campos fictícios
                 boolean utilizouContraste = col.length > 10 && Boolean.parseBoolean(col[10]);
                 String tipoContraste = col.length > 11 ? col[11] : "";
                 double dosagemContraste = col.length > 12 ? parseValor(col[12]) : 0.0;
@@ -88,13 +105,11 @@ public class Cliente {
                 boolean possuiImplantesMetalicos = col.length > 14 && Boolean.parseBoolean(col[14]);
                 exame = ExameSimpleFactory.criarExameRessonancia(paciente, medicoSolic, prioridade, subtipo, utilizouContraste, tipoContraste, dosagemContraste, possuiMarcapasso, possuiImplantesMetalicos);
             } else {
-                // Exame Laboratorial: tipo = tipoExame, valorMedido = parseValor(resultados), unidade
                 double valor = parseValor(resultados);
                 String unidade = resultados != null && resultados.contains(" ") ? resultados.split(" ")[1].replace(";", "") : "u";
                 exame = ExameSimpleFactory.criarExameLaboratorial(paciente, medicoSolic, prioridade, tipoExame, valor, unidade);
             }
 
-            // Processar via fachada (pagamento->fila->validacao->emissao->notificacao)
             sistema.processar(exame, outubro);
         }
 

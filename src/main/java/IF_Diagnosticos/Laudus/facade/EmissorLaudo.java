@@ -1,48 +1,76 @@
+package IF_Diagnosticos.Laudus.facade; // Certifique-se de que o pacote está correto
 
-
-package IF_Diagnosticos.Laudus.facade;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import IF_Diagnosticos.Laudus.adapter.PDFGenerator;
-import IF_Diagnosticos.Laudus.adapter.PDFGeneratorAdapter;
-import IF_Diagnosticos.Laudus.bridge.FormatoHTML;
-import IF_Diagnosticos.Laudus.bridge.FormatoTXT;
-import IF_Diagnosticos.Laudus.bridge.Laudo;
-import IF_Diagnosticos.Laudus.bridge.LaudoConcreto;
 import IF_Diagnosticos.Laudus.factory.Exame;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class EmissorLaudo {
-    private final File pasta = new File("emissoes");
 
-    public EmissorLaudo(){
-        if (!pasta.exists()) pasta.mkdirs();
+    // Se você tiver outros métodos ou lógica (Bridge/Adapter), eles permanecem
+    // aqui.
+
+    /**
+     * Gera os diversos formatos de laudo para um exame e seu conteúdo.
+     * Ao final, retorna o objeto File referente ao PDF gerado.
+     *
+     * @param exame    O exame a ser processado.
+     * @param conteudo O conteúdo validado do laudo.
+     * @return O objeto File do PDF gerado, ou null em caso de erro.
+     */
+    public File gerarArquivosLaudo(Exame exame, String conteudo) {
+
+        // --- CORREÇÃO APLICADA AQUI ---
+        // Usamos System.currentTimeMillis() para garantir um nome de arquivo único.
+        String nomeBase = "laudo_" + exame.getPaciente().getNome().replaceAll("\\s+", "_") + "_"
+                + System.currentTimeMillis();
+
+        System.out.println("Gerando laudos para o paciente: " + exame.getPaciente().getNome());
+
+        // Simulação da geração de outros formatos (opcional)
+        gerarLaudoTxt(nomeBase + ".txt", conteudo);
+        gerarLaudoHtml(nomeBase + ".html", conteudo);
+
+        // Lógica principal: gerar e retornar o arquivo PDF
+        File pdfFile = new File(nomeBase + ".pdf");
+
+        try {
+            // Simula a escrita de um conteúdo específico para PDF no arquivo
+            String conteudoPdf = "--- LAUDO MÉDICO EM PDF ---\n\n" + conteudo;
+            Files.write(Paths.get(pdfFile.getAbsolutePath()), conteudoPdf.getBytes());
+
+            System.out.println("Laudo em PDF gerado com sucesso em: " + pdfFile.getAbsolutePath());
+
+            return pdfFile;
+
+        } catch (IOException e) {
+            System.err.println("Erro crítico ao gerar o arquivo PDF: " + e.getMessage());
+            e.printStackTrace();
+
+            return null;
+        }
     }
 
-    public void gerarArquivosLaudo(Exame exame, String conteudo) {
-        Laudo txt = new LaudoConcreto(new FormatoTXT(), exame, conteudo);
-        Laudo html = new LaudoConcreto(new FormatoHTML(), exame, conteudo);
-        PDFGenerator pdfAdapter = new PDFGeneratorAdapter();
+    // Métodos auxiliares privados para gerar outros formatos (exemplo)
+    private void gerarLaudoTxt(String nomeArquivo, String conteudo) {
         try {
-            File txtFile = new File(pasta, "laudo_" + exame.getNumeroSequencial() + ".txt");
-            FileWriter txtWriter = new FileWriter(txtFile);
-            txtWriter.write(txt.gerar());
-            txtWriter.close();
-            System.out.println("Arquivo gerado: " + txtFile.getAbsolutePath());
-
-            File htmlFile = new File(pasta, "laudo_" + exame.getNumeroSequencial() + ".html");
-            FileWriter htmlWriter = new FileWriter(htmlFile);
-            htmlWriter.write(html.gerar());
-            htmlWriter.close();
-            System.out.println("Arquivo gerado: " + htmlFile.getAbsolutePath());
-
-            // PDF
-            String pdfPath = new File(pasta, "laudo_" + exame.getNumeroSequencial() + ".pdf").getAbsolutePath();
-            pdfAdapter.gerarPDF(pdfPath, txt.gerar());
+            String conteudoTxt = "--- LAUDO MÉDICO (.txt) ---\n\n" + conteudo;
+            Files.write(Paths.get(nomeArquivo), conteudoTxt.getBytes());
+            System.out.println("Laudo em TXT gerado: " + nomeArquivo);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Erro ao gerar arquivo TXT: " + e.getMessage());
+        }
+    }
+
+    private void gerarLaudoHtml(String nomeArquivo, String conteudo) {
+        try {
+            String conteudoHtml = "<html><body><h1>Laudo Médico</h1><p>" + conteudo.replace("\n", "<br>")
+                    + "</p></body></html>";
+            Files.write(Paths.get(nomeArquivo), conteudoHtml.getBytes());
+            System.out.println("Laudo em HTML gerado: " + nomeArquivo);
+        } catch (IOException e) {
+            System.err.println("Erro ao gerar arquivo HTML: " + e.getMessage());
         }
     }
 }
