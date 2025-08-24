@@ -44,7 +44,6 @@ public class Cliente {
         // --- Configuração da Infraestrutura (Injeção de Dependência Manual) ---
 
         // 1. Criar a dependência de baixo nível: EmailSender
-        // ATENÇÃO: Use uma "Senha de App" para o Gmail.
         EmailSender emailSender = new EmailSender(
             "nillocoelho@gmail.com",       // Usuário
             "mtvm nvgc ryol tfmx",          // Senha de App
@@ -52,10 +51,10 @@ public class Cliente {
             587                            // Porta TLS
         );
 
-        // 2. Injetar a dependência (EmailSender) na classe que a utiliza (Fachada)
+        // 2. Injetar a dependência na Fachada de Comunicação
         FachadaNotificacaoComunicacao fachadaCom = new FachadaNotificacaoComunicacao(emailSender);
 
-        // 3. Configurar o padrão Observer com a fachada já pronta.
+        // 3. Configurar o padrão Observer
         AssuntoNotificacao assunto = new AssuntoNotificacao();
         assunto.adicionarObservador(new NotificadorEmail(fachadaCom));
         assunto.adicionarObservador(new NotificadorTelegram(fachadaCom));
@@ -64,7 +63,7 @@ public class Cliente {
         ValidadorExame validador = new ValidadorExame();
         FilaPrioridade fila = new FilaPrioridade();
         EmissorLaudo emissor = new EmissorLaudo();
-        Pagamento pagamento = new Pagamento();
+        Pagamento pagamento = new Pagamento(); // A nova classe de pagamento
         
         SistemaDiagnosticoFacade sistema = new SistemaDiagnosticoFacade(validador, fila, emissor, assunto, pagamento);
 
@@ -78,7 +77,6 @@ public class Cliente {
         for (String[] col : linhas) {
             if (col.length < 12) continue;
             
-            // ... (o restante do seu loop 'for' para ler e processar o CSV continua exatamente igual)
             String nome = col[0];
             String convenio = col[1];
             LocalDate dataNasc = LocalDate.parse(col[2], f);
@@ -113,6 +111,6 @@ public class Cliente {
             sistema.processar(exame, outubro);
         }
 
-        System.out.println("\nProcessamento concluído.");
+        System.out.println("\nProcessamento geral concluído.");
     }
 }
