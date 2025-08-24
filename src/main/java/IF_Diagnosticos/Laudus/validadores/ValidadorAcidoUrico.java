@@ -1,18 +1,19 @@
+
 package IF_Diagnosticos.Laudus.validadores;
+import IF_Diagnosticos.Laudus.factory.ExameLaboratorial;
 
-import IF_Diagnosticos.Laudus.factory.ExameLaborial;
-
-public class ValidadorAcidoUrico extends ValidadorBase{
-    public String handle(ExameLaborial examesangue) {
-        String tipo = examesangue.getEspecialidade();
+public class ValidadorAcidoUrico extends ValidadorBase {
+    public String handle(ExameLaboratorial exame){
+        String tipo = exame.getTipo();
+        String unidade = exame.getUnidade().toString();
         if (tipo != null && tipo.equalsIgnoreCase("Acido urico")) {
-            return "Ácido úrico: " + examesangue.getValor() + " mg/dL\n" +
-                    "Valores de Referência:\n" +
-                    "Homens: 3,4 – 7,0 mg/dL\n" +
-                    "Mulheres: 2,4 – 6,0 mg/dL\n" +
-                    "Valores críticos: > 10 mg/dL";
+            return "Ácido úrico: " + exame.getValorMedido() + " " + unidade + "\n" +
+                   "Valores de Referência:\n" +
+                   "Homens: 3.4 – 7.0 " + unidade + "\n" +
+                   "Mulheres: 2.4 – 6.0 " + unidade + "\n" +
+                   "Valores críticos: > 10 " + unidade;
         } else {
-            return super.handle(examesangue);
+            return super.handle(exame);
         }
     }
 }

@@ -1,21 +1,20 @@
-package IF_Diagnosticos.Laudus.validadores;
 
-import IF_Diagnosticos.Laudus.factory.ExameLaborial;
+package IF_Diagnosticos.Laudus.validadores;
+import IF_Diagnosticos.Laudus.factory.ExameLaboratorial;
 
 public class ValidadorCreatinina extends ValidadorBase {
-    public String handle(ExameLaborial examesangue) {
-        String tipo = examesangue.getEspecialidade();
+    public String handle(ExameLaboratorial exame){
+        String tipo = exame.getTipo();
+        String unidade = exame.getUnidade().toString();
         if (tipo != null && tipo.equalsIgnoreCase("Creatinina")) {
-            return "Creatinina: " + examesangue.getValor() + " mg/dL\n" +
-                    "Valores de Referência:\n" +
-                    "Adultos (Homens): 0,50 – 1,30 mg/dL\n" +
-                    "Adultos (Mulheres): 0,40 – 1,10 mg/dL\n" +
-                    "Idosos (>60 anos): 0,30 – 1,20 mg/dL\n" +
-                    "Crianças: 0,20 – 0,50 mg/dL\n" +
-                    "Valores críticos:\n" +
-                    "Homens > 1,5 mg/dL, Mulheres > 1,2 mg/dL, Idosos > 1,5 mg/dL, Crianças > 0,8 mg/dL";
+            return "Creatinina: " + exame.getValorMedido() + " " + unidade + "\n" +
+                   "Valores de Referência:\n" +
+                   "Adultos (Homens): 0,50 – 1,30 " + unidade + "\n" +
+                   "Adultos (Mulheres): 0,40 – 1,10 " + unidade + "\n" +
+                   "Idosos (>60 anos): 0,30 – 1,20 " + unidade + "\n" +
+                   "Crianças: 0,20 – 0,50 " + unidade;
         } else {
-            return super.handle(examesangue);
+            return super.handle(exame);
         }
     }
 }

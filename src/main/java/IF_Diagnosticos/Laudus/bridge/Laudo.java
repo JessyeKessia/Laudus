@@ -2,18 +2,16 @@ package IF_Diagnosticos.Laudus.bridge;
 
 import IF_Diagnosticos.Laudus.factory.Exame;
 
-
 public abstract class Laudo {
-    private Exame exame;
-    private String conteudo;
-    protected LaudoFormato formatador;
+    protected FormatoLaudo formato;
+    protected Exame exame;
+    protected String conteudo;
 
-    public Laudo (LaudoFormato formatador, Exame exame, String conteudo) {
-        this.formatador = formatador;
+    public Laudo(FormatoLaudo formato, Exame exame, String conteudo) {
+        this.formato = formato;
         this.exame = exame;
         this.conteudo = conteudo;
     }
 
-    public abstract String renderizar();
+    public abstract String gerar();
 }
-

@@ -1,44 +1,46 @@
+
+
 package IF_Diagnosticos.Laudus.facade;
 
-import IF_Diagnosticos.Laudus.adapter.AdapterPDF;
-import IF_Diagnosticos.Laudus.bridge.*;
-import IF_Diagnosticos.Laudus.entidades.Medico;
-
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import IF_Diagnosticos.Laudus.adapter.PDFGenerator;
+import IF_Diagnosticos.Laudus.adapter.PDFGeneratorAdapter;
+import IF_Diagnosticos.Laudus.bridge.FormatoHTML;
+import IF_Diagnosticos.Laudus.bridge.FormatoTXT;
+import IF_Diagnosticos.Laudus.bridge.Laudo;
+import IF_Diagnosticos.Laudus.bridge.LaudoConcreto;
+import IF_Diagnosticos.Laudus.factory.Exame;
+
 public class EmissorLaudo {
-    public String emitirLaudo(Exame exame, String conteudo, Medico medicoResponsavel) {
-        LaudoFormato formato;
+    private final File pasta = new File("emissoes");
 
-        switch (exame.toUpperCase()) {
-            case "TEXTO":
-                formato = new FormatoTexto();
-                break;
-            case "HTML":
-                formato = new FormatoHTML();
-                break;
-            default:
-                AdapterPDF adapterPDF = new AdapterPDF(); // cria instância
-                adapterPDF.gerarPDF(exame, conteudo, medicoResponsavel); // gera PDF com adapter
-                return null;
-        }
+    public EmissorLaudo(){
+        if (!pasta.exists()) pasta.mkdirs();
+    }
 
-        Exame exame = new Exame(formato);
-        String laudoConteudo = laudo.gerar(exame, paciente, medicoSolicitante, conteudo, medicoResponsavel);
+    public void gerarArquivosLaudo(Exame exame, String conteudo) {
+        Laudo txt = new LaudoConcreto(new FormatoTXT(), exame, conteudo);
+        Laudo html = new LaudoConcreto(new FormatoHTML(), exame, conteudo);
+        PDFGenerator pdfAdapter = new PDFGeneratorAdapter();
+        try {
+            File txtFile = new File(pasta, "laudo_" + exame.getNumeroSequencial() + ".txt");
+            FileWriter txtWriter = new FileWriter(txtFile);
+            txtWriter.write(txt.gerar());
+            txtWriter.close();
+            System.out.println("Arquivo gerado: " + txtFile.getAbsolutePath());
 
-        // Fazendo a emissão
-        String nomeArquivo;
+            File htmlFile = new File(pasta, "laudo_" + exame.getNumeroSequencial() + ".html");
+            FileWriter htmlWriter = new FileWriter(htmlFile);
+            htmlWriter.write(html.gerar());
+            htmlWriter.close();
+            System.out.println("Arquivo gerado: " + htmlFile.getAbsolutePath());
 
-        if (tipoFormato.equalsIgnoreCase("HTML")) {
-            nomeArquivo = "/emissoes" + "laudo_" + exame.getTipo().replaceAll("\\s+", "_") + ".html";
-        } else { // TXT
-            nomeArquivo = "/emissoes" + "laudo_" + exame.getTipo().replaceAll("\\s+", "_") + ".txt";
-        }
-
-        try (FileWriter writer = new FileWriter(nomeArquivo)) {
-            writer.write(laudoConteudo);
-            System.out.println("Laudo gerado com sucesso em: " + nomeArquivo);
+            // PDF
+            String pdfPath = new File(pasta, "laudo_" + exame.getNumeroSequencial() + ".pdf").getAbsolutePath();
+            pdfAdapter.gerarPDF(pdfPath, txt.gerar());
         } catch (IOException e) {
             e.printStackTrace();
         }

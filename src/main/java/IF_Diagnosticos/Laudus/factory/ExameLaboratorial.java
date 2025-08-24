@@ -1,25 +1,25 @@
+
+
 package IF_Diagnosticos.Laudus.factory;
 
 import IF_Diagnosticos.Laudus.entidades.Medico;
 import IF_Diagnosticos.Laudus.entidades.Paciente;
-import IF_Diagnosticos.Laudus.utils.GeradorNumeroSequencial;
+import IF_Diagnosticos.Laudus.prioridade.Prioridade;
 
-public class ExameLaboratorial implements Exame {
-    private long numeroSequencial;
-    private String tipo;
-    private double valor;
-    private String unidade;
-    private Paciente paciente;
-    private Medico medico;
-    private String prioridade;
+public class ExameLaboratorial extends Exame {
+    private String tipo;      // ex: "Hemograma"
+    private double valorMedido;   // ex: 13.5
+    private String unidade;       // ex: g/dL
 
-
-    public ExameLaboratorial(Paciente paciente, Medico medico, String prioridade, String tipo, double valor) {
-        super(paciente, medico, prioridade, formato);
-        this.numeroSequencial = GeradorNumeroSequencial.getInstancia().getProximoNumero();
+    public ExameLaboratorial(Paciente paciente, Medico solicitante, Medico responsavel, Prioridade prioridade, String tipo, double valorMedido, String unidade) {
+        super(prioridade, paciente, solicitante);
         this.tipo = tipo;
-        this.valor = valor;
+        this.valorMedido = valorMedido;
         this.unidade = unidade;
+        setValorBase(200); 
     }
 
+    public double getValorMedido(){ return valorMedido; }
+    public String getUnidade(){ return unidade; }
+    public String getTipo(){ return tipo; }
 }

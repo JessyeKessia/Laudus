@@ -1,19 +1,19 @@
+
 package IF_Diagnosticos.Laudus.validadores;
-
-
-import IF_Diagnosticos.Laudus.factory.ExameLaborial;
+import IF_Diagnosticos.Laudus.factory.ExameLaboratorial;
 
 public class ValidadorColesterol extends ValidadorBase {
-    public String handle(ExameLaborial examesangue) {
-        String tipo = examesangue.getEspecialidade();
+    public String handle(ExameLaboratorial exame){
+        String tipo = exame.getTipo();
+        String unidade = exame.getUnidade().toString();
         if (tipo != null && tipo.equalsIgnoreCase("Colesterol")) {
-            return "Colesterol total: " + examesangue.getValor() + " mg/dL\n" +
-                    "Valores de Referência:\n" +
-                    "Alto: ≥ 240 mg/dL (aumenta risco cardiovascular)\n" +
-                    "Limítrofe: 200 – 239 mg/dL\n" +
-                    "Desejável: ≥ 200 mg/dL (fator protetor)";
+            return "Colesterol total: " + exame.getValorMedido() + " " + unidade + "\n" +
+                   "Valores de Referência:\n" +
+                   "Alto: >= 240 " + unidade + "\n" +
+                   "Limítrofe: 200 – 239 " + unidade + "\n" +
+                   "Desejável: < 200 " + unidade;
         } else {
-            return super.handle(examesangue);
+            return super.handle(exame);
         }
     }
 }

@@ -1,3 +1,4 @@
+
 package IF_Diagnosticos.Laudus.entidades;
 
 public class Medico {
@@ -8,12 +9,8 @@ public class Medico {
         this.nome = nome;
         this.crm = crm;
     }
-
-    public String getNome() {
-        return nome;
-    }
+    public String getNome() { return nome; }
     public String getCrm() { return crm; }
-
     public void setNome(String nome) { this.nome = nome; }
     public void setCrm(String crm) { this.crm = crm; }
 }

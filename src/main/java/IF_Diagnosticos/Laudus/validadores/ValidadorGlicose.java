@@ -1,16 +1,18 @@
-package IF_Diagnosticos.Laudus.validadores;
 
-import IF_Diagnosticos.Laudus.factory.ExameLaborial;
+package IF_Diagnosticos.Laudus.validadores;
+import IF_Diagnosticos.Laudus.factory.ExameLaboratorial;
 
 public class ValidadorGlicose extends ValidadorBase {
-    public String handle(ExameLaborial exame) {
-        String tipo = exame.getEspecialidade();
-        if (tipo != null && tipo.equalsIgnoreCase("GLICOSE")) {
-            return exame.getValor() + " Valores de Referência\n"
-                    + "Normal: 60 a 99 mg/dL\n"
-                    + "Hipoglicemia: < 60 mg/dL\n"
-                    + "Intolerante: 100 a 125 mg/dL\n"
-                    + "Diabetes: Acima de 125 mg/dL";
+    public String handle(ExameLaboratorial exame){
+        String tipo = exame.getTipo();
+        String unidade = exame.getUnidade().toString();
+        if (tipo != null && tipo.equalsIgnoreCase("Glicose")) {
+            return "Glicose: " + exame.getValorMedido() + " " + unidade + "\n" +
+                   "Valores de Referência:\n" +
+                   "Normal: 60 a 99 " + unidade + "\n" +
+                   "Hipoglicemia: < 60 " + unidade + "\n" +
+                   "Intolerante: 100 a 125 " + unidade + "\n" +
+                   "Diabetes: >= 126 " + unidade;
         } else {
             return super.handle(exame);
         }

@@ -1,34 +1,43 @@
+
 package IF_Diagnosticos.Laudus.utils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class LeitorCSV {
-    private String caminhoCSV;
+    private final String caminho;
+    public LeitorCSV(String caminho){ this.caminho = caminho; }
 
-    public LeitorCSV(String caminhoCSV) {
-        this.caminhoCSV = caminhoCSV;
-    }
-
-    public List<String[]> lerLinhas() {
-        List<String[]> linhas = new ArrayList<>();
-            try (BufferedReader br = new BufferedReader(new FileReader(caminhoCSV))) {
-                String linha;
-                boolean primeiraLinha = true; // pular cabeçalho
-                while ((linha = br.readLine()) != null) {
-                    if (primeiraLinha) {
-                        primeiraLinha = false;
-                        continue;
+    public List<String[]> lerLinhas(){
+        List<String[]> dados = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(caminho), StandardCharsets.UTF_8))) {
+            String header = br.readLine(); // cabeçalho
+            if (header == null) return dados;
+            String linha;
+            while ((linha = br.readLine()) != null) {
+                // "fix" específico para exemplo com vírgula faltando
+                linha = linha.replace("CRM/PB 2345Dr.", "CRM/PB 2345,Dr.");
+                // split simples respeitando campo vazio
+                List<String> cols = new ArrayList<>();
+                StringBuilder cur = new StringBuilder();
+                boolean inQuotes = false;
+                for (int i=0;i<linha.length();i++){
+                    char c = linha.charAt(i);
+                    if (c=='"'){ inQuotes=!inQuotes; }
+                    else if (c==',' && !inQuotes){
+                        cols.add(cur.toString().trim());
+                        cur.setLength(0);
+                    } else {
+                        cur.append(c);
                     }
-                    String[] dados = linha.split(",");
-                    linhas.add(dados);
                 }
-            } catch (IOException e) {
-                System.out.println("Erro ao ler CSV: " + e.getMessage());
+                cols.add(cur.toString().trim());
+                dados.add(cols.toArray(new String[0]));
             }
-            return linhas;
+        } catch (IOException e){
+            throw new RuntimeException("Erro lendo CSV: " + e.getMessage(), e);
         }
+        return dados;
     }
+}

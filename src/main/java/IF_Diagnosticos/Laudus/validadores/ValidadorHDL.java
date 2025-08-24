@@ -1,15 +1,16 @@
-package IF_Diagnosticos.Laudus.validadores;
 
-import IF_Diagnosticos.Laudus.factory.ExameLaborial;
+package IF_Diagnosticos.Laudus.validadores;
+import IF_Diagnosticos.Laudus.factory.ExameLaboratorial;
 
 public class ValidadorHDL extends ValidadorBase {
-    public String handle(ExameLaborial exame) {
-        String tipo = exame.getEspecialidade();
+    public String handle(ExameLaboratorial exame){
+        String tipo = exame.getTipo();
+        String unidade = exame.getUnidade().toString();
         if (tipo != null && tipo.equalsIgnoreCase("HDL")) {
-            return "Colesterol HDL: " + exame.getValor() + " mg/dL\n" +
-                    "Valores de Referência:\n" +
-                    "Baixo: < 40 mg/dL (homens), < 50 mg/dL (mulheres)\n" +
-                    "Normal: ≥ 40 mg/dL (homens), ≥ 50 mg/dL (mulheres)";
+            return "Colesterol HDL: " + exame.getValorMedido() + " " + unidade + "\n" +
+                   "Valores de Referência:\n" +
+                   "Baixo: < 40 " + unidade + " (homens), < 50 " + unidade + " (mulheres)\n" +
+                   "Normal: >= 40 " + unidade + " (homens), >= 50 " + unidade + " (mulheres)";
         } else {
             return super.handle(exame);
         }
