@@ -167,7 +167,7 @@ package "Padrão Strategy: Prioridade de Exames" {
     }
 
     interface EstrategiaPrioridade {
-        +determinarPrioridade(exame: Exame): int
+        +detreminarPrioridade(exame: Exame): int
     }
 
     class EstrategiaPrioridadeUrgente implements EstrategiaPrioridade
