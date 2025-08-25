@@ -8,8 +8,8 @@
 
 ## 👾 Padrões de projeto utilizados
 
-- Simple Factory: para fazer a criação dos exames;
-- Facade: Centralizando e simplificando o acesso
+- Simple Factory: para fazer a criação dos exames.
+- Facade: Centralizando e simplificando o acesso às outras classes.
 - Bridge: Separar tipos de laudos dos formatos de laudo (HTML, PDF, etc.).
 - Observer: Notificar paciente por e-mail e número de telefone.
 - Chain of Responsibility: Validar exames laboratoriais com diferentes regras.
@@ -17,7 +17,7 @@
 - State: 	Controlar estado do pagamento: pagamento pendente, pagamento aprovado e pagamento cancelado.
 - Strategy + Simple Factory: Definir prioridade do exame (Urgente, Pouco Urgente, Rotina).
 - Adapter: Adaptar para o uso para PDF.
-
+- Singleton: para criação de ID únicos.
 
 
 ## 🛠️ Tecnologias Utilizadas
