@@ -1,6 +1,8 @@
 package IF_Diagnosticos.Laudus.notificacao;
 
 import IF_Diagnosticos.Laudus.entidades.Paciente;
+import IF_Diagnosticos.Laudus.facade.FachadaNotificacaoComunicacao;
+
 import java.io.File;
 
 public class NotificadorTelegram implements ObservadorNotificacao {
@@ -12,7 +14,6 @@ public class NotificadorTelegram implements ObservadorNotificacao {
 
     @Override
     public void atualizar(Paciente paciente, String mensagem, File anexo) {
-        // A lógica do Telegram ignora o anexo por enquanto.
         fachada.enviarTelegram(paciente, mensagem);
     }
 }

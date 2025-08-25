@@ -11,7 +11,6 @@ public class ValidadorExame {
 
     private final Scanner scanner = new Scanner(System.in);
 
-    // CORREÇÃO PRINCIPAL: O tipo de retorno do método foi alterado de 'String' para 'ResultadoValidacao'
     public ResultadoValidacao validar(Exame exame) {
         System.out.println("\n--- INICIANDO VALIDAÇÃO PARA O PACIENTE: " + exame.getPaciente().getNome() + " ---");
         ResultadoValidacao resultado;
@@ -62,7 +61,6 @@ public class ValidadorExame {
                "Descrição do Laudo:\n" + rx.getLaudoDescricao();
     }
 
-    // Este método também foi ajustado para retornar 'ResultadoValidacao'
     private ResultadoValidacao validarExameRessonancia(ExameRessonancia rm) {
         if (rm.isPossuiMarcapasso() || rm.isPossuiImplantesMetalicos()) {
             String motivo = rm.isPossuiMarcapasso() ? "possui marcapasso cardíaco" : "possui implantes metálicos";

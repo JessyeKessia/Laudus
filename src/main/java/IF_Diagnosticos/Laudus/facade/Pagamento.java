@@ -12,17 +12,15 @@ public class Pagamento {
     public boolean processarPagamento(Exame exame, boolean aplicarOutubroRosa) {
         System.out.println("\n--- INICIANDO PROCESSAMENTO DE PAGAMENTO PARA: " + exame.getPaciente().getNome() + " ---");
 
-        // CORREÇÃO CRÍTICA: Validação dos dados de entrada ANTES do pagamento.
-        // Se for um exame laboratorial, verificamos se o resultado médico é válido (não negativo).
+
         if (exame instanceof ExameLaboratorial lab && lab.getValorMedido() < 0) {
             System.out.println("❌ ERRO: O resultado do exame (" + lab.getValorMedido() + ") é inválido. Pagamento não pode ser processado.");
             System.out.println("--- FIM DO PROCESSAMENTO DE PAGAMENTO ---");
-            return false; // Retorna 'false' e a fachada irá interromper o processo.
+            return false; 
         }
 
         System.out.println("Valor base do exame (" + exame.getTipo() + "): R$ " + String.format("%.2f", exame.getValorBase()));
 
-        // 1. Aplica descontos via Decorator
         Exame exameDecorado = exame;
         
         if (exame.getPaciente().getConvenio() != null && !exame.getPaciente().getConvenio().isBlank()) {
@@ -38,12 +36,10 @@ public class Pagamento {
             exameDecorado = new ExameDescontoOutubroRosa(exameDecorado);
         }
 
-        // 2. Cria o contexto de pagamento com o valor final após descontos
         ContextoPagamento contexto = new ContextoPagamento(exameDecorado);
         System.out.println("Valor final com descontos: R$ " + String.format("%.2f", contexto.getValorTotal()));
         System.out.println("[ESTADO INICIAL]: Pagamento Pendente");
 
-        // 3. Processa o pagamento usando o padrão State
         boolean pagamentoOk = contexto.processarPagamento();
         
         System.out.println("--- FIM DO PROCESSAMENTO DE PAGAMENTO ---");

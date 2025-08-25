@@ -3,11 +3,17 @@
 skinparam classAttributeIconStyle public private
 hide empty members
 
-' 0. Entidades de Domínio Básicas
-package "Entidades de Domínio" {
+' ------------------------------
+' Entidades de domínio
+' ------------------------------
+package "Entidades" {
     class Paciente {
         +nome: String
         +convenio: String
+        +email: String
+        +dataNascimento: LocalDate
+        +telefone: String
+
     }
 
     class Medico {
@@ -15,36 +21,17 @@ package "Entidades de Domínio" {
         +crm: String
     }
 
-    enum TipoPrioridade {
-        URGENTE
-        POUCO_URGENTE
-        ROTINA
+    enum TipoPrioridade { 
+        URGENTE 
+        POUCO_URGENTE 
+        ROTINA 
     }
 }
 
-' 1. Bridge Pattern: Exame e Formatação de Laudo
-package "Padrão Bridge: Laudo" {
-    interface FormatoLaudo {
-        +gerar(exame: Exame, conteudo: String): File
-    }
-
-    class FormatoTXT implements FormatoLaudo { 
-        +gerar(exame: Exame, conteudo: String): File
-    }
-    class FormatoHTML implements FormatoLaudo { 
-        +gerar(exame: Exame, conteudo: String): File
-    }
-    class PDFGeneratorAdapter implements FormatoLaudo { 
-        +gerar(exame: Exame, conteudo: String): File
-        -pdfService: PDFGenerator
-    }
-
-    class Laudo {
-        +formato: FormatoLaudo
-        +medicoResponsavel: Medico
-        +gerar(): File
-    }
-
+' ------------------------------
+' Núcleo do domínio: Exame / Laudo
+' ------------------------------
+package "Domínio - Exame/Laudo" {
     abstract class Exame {
         +idExame: String
         +paciente: Paciente
@@ -52,184 +39,146 @@ package "Padrão Bridge: Laudo" {
         +dataExame: Date
         +precoBase: double
         +prioridade: TipoPrioridade
+        +getNumeroSequencial(): int
         +validar(): boolean
         +calcularPreco(): double
-        +setFormatoLaudo(formato: FormatoLaudo): void
-        +laudo: Laudo
     }
 
-    class ExameHemograma extends Exame 
+    class ExameHemograma extends Exame
     class ExameUltrassonografia extends Exame
     class ExameRessonanciaMagnetica extends Exame
 
-    Exame "1" o-- "1" FormatoLaudo
-    Exame "1" *-- "1" Laudo : gera >>
-    Exame --> Paciente
-    Exame --> Medico : solicitante
-    Laudo --> Medico : responsável
-    Laudo --> FormatoLaudo
-}
-
-' 1.5 Adapter Pattern: Geração de PDF
-package "Padrão Adapter: Geração de PDF" {
-    interface PDFGenerator {
-        +gerarPDF(nomeArquivo: String, conteudo: String): void
-    }
-
-    ' Serviço concreto usado pelo adapter - usa PDFBox internamente (represented by class PDFService)
-    class PDFService implements PDFGenerator {
-        +gerarPDF(nomeArquivo: String, conteudo: String): void
-    }
-
-    ' Adapter clássico: implementa FormatoLaudo e delega I/O ao PDFGenerator (injetado)
-    class PDFGeneratorAdapter implements FormatoLaudo {
-        -pdfService: PDFGenerator
-        +PDFGeneratorAdapter(pdfService: PDFGenerator)
+    class LaudoConcreto {
+        -formato: FormatoLaudo
+        +LaudoConcreto(formato: FormatoLaudo)
         +gerar(exame: Exame, conteudo: String): File
     }
 
-    PDFGeneratorAdapter ..|> FormatoLaudo
-    PDFGeneratorAdapter --> PDFGenerator
-    PDFService ..|> PDFGenerator
+    Exame "1" o-- "1" LaudoConcreto : gera
 }
 
-' 2. Chain of Responsibility: Validação de Exames
-package "Padrão Chain of Responsibility: Validação" {
-    interface ValidadorLaboratorial {
-        +setProximo(proximo: ValidadorLaboratorial): void
-        +handle(exame: ExameLaboratorial): String
+' ------------------------------
+' Formatos / Bridge
+' ------------------------------
+package "Formatação (Bridge)" {
+    interface FormatoLaudo {
+        +gerar(exame: Exame, conteudo: String): File 
     }
 
-    abstract class ValidadorBase implements ValidadorLaboratorial {
-        -proximo: ValidadorLaboratorial
-        +setProximo(proximo: ValidadorLaboratorial): void
-        +handle(exame: ExameLaboratorial): String
+    class FormatoTXT implements FormatoLaudo { 
+        +gerar(...): File 
+    }
+    class FormatoHTML implements FormatoLaudo { 
+        +gerar(...): File \n +embedLogo(pathOuBytes): String 
+    }
+    class FormatoPDF implements FormatoLaudo { 
+        +gerar(...): File 
+    }
+
+    LaudoConcreto --> FormatoLaudo
+}
+
+' ------------------------------
+' Validação (Chain of Responsibility)
+' ------------------------------
+package "Validação" {
+    interface ValidadorLaboratorial { 
+        +setProximo(v: ValidadorLaboratorial): void \n +handle(exame: Exame): String 
+    }
+    abstract class ValidadorBase implements ValidadorLaboratorial { 
+        -proximo: ValidadorLaboratorial 
     }
 
     class ValidadorGlicose implements ValidadorLaboratorial
     class ValidadorCreatinina implements ValidadorLaboratorial
-    class ValidadorHDL implements ValidadorLaboratorial
-    class ValidadorLDL implements ValidadorLaboratorial
-    class ValidadorColesterol implements ValidadorLaboratorial
-    class ValidadorUreia implements ValidadorLaboratorial
-    class ValidadorAcidoUrico implements ValidadorLaboratorial
     class ValidadorHemograma implements ValidadorLaboratorial
-
-    ValidadorBase "1" o-- "0..1" ValidadorLaboratorial
 }
 
-' 3. Observer Pattern: Notificações
-package "Padrão Observer: Notificações" {
-    interface ObservadorNotificacao {
-        +atualizar(paciente: Paciente, mensagem: String): void
+' ------------------------------
+' Fila e Prioridade (Strategy)
+' ------------------------------
+package "Fila / Prioridade" {
+    class FilaPrioridade { 
+        +adicionarExame(exame: Exame): void \n 
+        +proximoExame(): Exame 
     }
-
-    class AssuntoNotificacao {
-        -observadores: List<ObservadorNotificacao>
-        +adicionarObservador(observador: ObservadorNotificacao): void
-        +removerObservador(observador: ObservadorNotificacao): void
-        +notificarObservadores(paciente: Paciente, mensagem: String): void
+    interface EstrategiaPrioridade { 
+        +detreminarPrioridade(exame: Exame): int 
     }
+    class EstrategiaPrioridadeUrgente implements EstrategiaPrioridade
+    class EstrategiaPrioridadePoucoUrgente implements EstrategiaPrioridade
+    class EstrategiaPrioridadeRotina implements EstrategiaPrioridade
 
-    class NotificadorWhatsapp implements ObservadorNotificacao
-    class NotificadorSms implements ObservadorNotificacao
-    class NotificadorEmail implements ObservadorNotificacao
-
-    class FachadaNotificacaoComunicacao <<Facade>> {
-        +enviarWhatsapp(paciente: Paciente, mensagem: String): void
-        +enviarSMS(paciente: Paciente, mensagem: String): void
-        +enviarEmail(paciente: Paciente, mensagem: String): void
-    }
-
-    AssuntoNotificacao "1" o-- "0..*" ObservadorNotificacao
-    NotificadorWhatsapp .right.> FachadaNotificacaoComunicacao
-    NotificadorSms .right.> FachadaNotificacaoComunicacao
-    NotificadorEmail .right.> FachadaNotificacaoComunicacao
+    FilaPrioridade "1" o-- "1" EstrategiaPrioridade
 }
 
-' 4. Decorator Pattern: Descontos
-package "Padrão Decorator: Descontos" {
-    interface Desconto {
-        +aplicarDesconto(originalPrice: double): double
+' ------------------------------
+' Pagamento (State)
+' ------------------------------
+package "Pagamento" {
+    class ContextoPagamento { 
+        -estado: EstadoPagamento \n 
+        -valorTotal: double \n 
+        +setEstado(e: EstadoPagamento): void \n 
+        +processarPagamento(): boolean 
+        }
+    interface EstadoPagamento { 
+        +lidarPagamento(contexto: ContextoPagamento): boolean 
     }
+    class PagamentoPendente implements EstadoPagamento
+    class PagamentoAprovado implements EstadoPagamento
+    class PagamentoRecusado implements EstadoPagamento
+}
 
+' ------------------------------
+' Descontos (Decorator)
+' ------------------------------
+package "Descontos" {
+    interface Desconto { 
+        +aplicarDesconto(preco: double): double 
+    }
     class PrecoBase implements Desconto
     class DescontoConvenio extends PrecoBase
     class DescontoIdoso extends PrecoBase
     class DescontoOutubroRosa extends PrecoBase
 }
 
-' 5. Strategy Pattern: Prioridade de Exames
-package "Padrão Strategy: Prioridade de Exames" {
-    class FilaDePrioridade {
-        +adicionarExame(exame: Exame): void
-        +proximoExame(): Exame
+' ------------------------------
+' Notificações (Observer)
+' ------------------------------
+package "Notificações" {
+    interface ObservadorNotificacao { 
+        +atualizar(paciente: Paciente, mensagem: String): void 
     }
-
-    interface EstrategiaPrioridade {
-        +detreminarPrioridade(exame: Exame): int
+    class AssuntoNotificacao { 
+        -observadores: List<ObservadorNotificacao> \n 
+        +adicionarObservador(...): void \n 
+        +notificarObservadores(...): void 
     }
-
-    class EstrategiaPrioridadeUrgente implements EstrategiaPrioridade
-    class EstrategiaPrioridadePoucoUrgente implements EstrategiaPrioridade
-    class EstrategiaPrioridadeRotina implements EstrategiaPrioridade
-
-    FilaDePrioridade "1" o-- "1" EstrategiaPrioridade
+    class NotificadorEmail implements ObservadorNotificacao
+    class NotificadorSms implements ObservadorNotificacao
+    class NotificadorTelegram implements ObservadorNotificacao
 }
 
-' 6. State Pattern: Pagamento
-package "Padrão State: Pagamento" {
-    class ContextoPagamento {
-        -estado: EstadoPagamento
-        -valorTotal: double
-        +setEstado(estado: EstadoPagamento): void
-        +processarPagamento(): boolean
-        +aplicarDescontos(descontosAplicar: List<Desconto>): void
+' ------------------------------
+' Facade / Orquestração
+' ------------------------------
+package "Facade" {
+    class SistemaDiagnosticoFacade <<Facade>> { 
+        -validador: ValidadorExame \n 
+        -fila: FilaPrioridade \n -emissor: EmissorLaudo \n 
+        -assunto: AssuntoNotificacao \n 
+        -pagamento: Pagamento \n 
+        +processar(exame: Exame, aplicarOutubroRosa: boolean): File 
     }
 
-    interface EstadoPagamento {
-        +lidarPagamento(contexto: ContextoPagamento): boolean
+    class ResultadoValidacao { 
+        -sucesso: boolean \n -conteudo: String 
     }
 
-    class PagamentoPendente implements EstadoPagamento
-    class PagamentoAprovado implements EstadoPagamento
-    class PagamentoRecusado implements EstadoPagamento
-
-    ContextoPagamento "1" *-- "1" EstadoPagamento
-    ContextoPagamento "1" o-- "0..*" Desconto
-}
-
-' 7. Facade Pattern: Orquestração do Sistema
-package "Padrão Facade: Sistema Diagnóstico" {
-    class SistemaDiagnosticoFacade <<Facade>> {
-        -validador: ValidadorExame
-        -fila: FilaPrioridade
-        -emissor: EmissorLaudo
-        -assunto: AssuntoNotificacao
-        -pagamento: Pagamento
-        +SistemaDiagnosticoFacade(validador: ValidadorExame, fila: FilaPrioridade, emissor: EmissorLaudo, assunto: AssuntoNotificacao, pagamento: Pagamento)
-        +processar(exame: Exame, aplicarOutubroRosa: boolean): void
-    }
-
-    class ResultadoValidacao {
-        -sucesso: boolean
-        -conteudo: String
-        +ResultadoValidacao(sucesso: boolean, conteudo: String)
-        +isSucesso(): boolean
-        +getConteudo(): String
-    }
-
-    class EmissorLaudo {
-        -PASTA_LAUDOS: String
-        +gerarArquivosLaudo(exame: Exame, conteudo: String): File
-    }
-
-    class ValidadorExame {
-        +validar(exame: Exame): ResultadoValidacao
-    }
-
-    class Pagamento {
-        +processarPagamento(exame: Exame, aplicarOutubroRosa: boolean): boolean
+    class EmissorLaudo { 
+        -PASTA_LAUDOS: String \n 
+        +gerarArquivosLaudo(exame: Exame, conteudo: String): File 
     }
 
     SistemaDiagnosticoFacade .right.> FilaPrioridade
@@ -237,31 +186,30 @@ package "Padrão Facade: Sistema Diagnóstico" {
     SistemaDiagnosticoFacade .right.> EmissorLaudo
     SistemaDiagnosticoFacade .right.> ValidadorExame
     SistemaDiagnosticoFacade .right.> Pagamento
-    ' Dependências explícitas ligando a fachada aos serviços auxiliares com assinaturas
-    SistemaDiagnosticoFacade ..> ValidadorExame : validar(exame): ResultadoValidacao
-    ValidadorExame ..> ResultadoValidacao : retorna
-    ' ValidadorExame constrói e usa a cadeia de ValidadorLaboratorial
-    ValidadorExame ..> ValidadorLaboratorial : criarChain() / handle(exameLaboratorial): String
-    SistemaDiagnosticoFacade ..> FilaPrioridade : adicionarExame(exame) / processarProximo(): Exame
-    ' Dependência explícita mostrando que a fachada chama processarPagamento(...) em Pagamento
-    SistemaDiagnosticoFacade ..> Pagamento : processarPagamento(exame, aplicarOutubroRosa): boolean
-    ' Pagamento usa o Contexto do padrão State
-    Pagamento ..> ContextoPagamento : usa
 }
 
-' 8. Cliente Principal
+' ------------------------------
+' Aplicação cliente
+' ------------------------------
 package "Aplicação Cliente" {
-    class AplicacaoPrincipal <<Client>> {
-        -sistemaDiagnosticoFacade: SistemaDiagnosticoFacade
-        +main(): void
-    }
-
+    class AplicacaoPrincipal <<Client>> { 
+        -sistemaDiagnosticoFacade: SistemaDiagnosticoFacade \n 
+        +main(): void }
     AplicacaoPrincipal .down.> SistemaDiagnosticoFacade
 }
 
-' Conexões gerais
-Exame .up.> Paciente
-Exame .up.> Medico
-Exame .up.> ValidadorExame
-FilaDePrioridade "1" o-- "0..*" Exame
+' Relações gerais
+Exame --> Paciente
+Exame --> Medico : solicitante
+LaudoConcreto --> FormatoLaudo
+PDFGeneratorAdapter ..|> FormatoLaudo
+PDFService ..|> PDFGenerator
+
+note bottom
+  Resumo:
+  - `EmissorLaudo` orquestra validação, fila, pagamento, geração (TXT/HTML/PDF) e notificação.
+  - `FormatoPDF` pode ser implementado diretamente ou via `PDFGeneratorAdapter` (PDFBox).
+  - `FormatoHTML` tenta embutir logo como data URI para compatibilidade.
+end note
+
 @enduml

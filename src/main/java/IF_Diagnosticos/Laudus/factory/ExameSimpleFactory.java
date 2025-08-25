@@ -7,7 +7,6 @@ import IF_Diagnosticos.Laudus.prioridade.Prioridade;
 public class ExameSimpleFactory {
     
     public static Exame criarExameLaboratorial(Paciente paciente, Medico solicitante, Prioridade prioridade, String tipo, double valorMedido, String unidade) {
-        // CORREÇÃO: A chamada foi revertida para o construtor original de 7 argumentos.
         return new ExameLaboratorial(paciente, solicitante, solicitante, prioridade, tipo, valorMedido, unidade);
     }
 

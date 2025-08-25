@@ -17,7 +17,9 @@ public class FormatoHTML implements FormatoLaudo {
         sb.append("    <title>Laudo</title>\n");
         sb.append("  </head>\n");
         sb.append("  <body>\n");
+        sb.append("    <img src='Laudus/src/main/java/IF_Diagnosticos/Laudus/logo/logo.png' alt='Logo IF Diagnósticos' class='logo'/>\n");
         sb.append("    <h2>Laboratório IF Diagnósticos</h2>\n");
+
         sb.append("    <p><b>Paciente:</b> ").append(exame.getPaciente().getNome()).append("</p>\n");
         sb.append("    <p><b>Exame:</b> ").append(exame.getTipo()).append(" - ").append(exame.getPrioridade()).append("</p>\n");
         sb.append("    <p><b>Convênio:</b> ").append(exame.getPaciente().getConvenio()).append("</p>\n");

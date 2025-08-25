@@ -41,9 +41,7 @@ public class Cliente {
             return;
         }
 
-        // --- Configuração da Infraestrutura (Injeção de Dependência Manual) ---
 
-        // 1. Criar a dependência de baixo nível: EmailSender
         EmailSender emailSender = new EmailSender(
             "nillocoelho@gmail.com",       // Usuário
             "mtvm nvgc ryol tfmx",          // Senha de App
@@ -51,23 +49,19 @@ public class Cliente {
             587                            // Porta TLS
         );
 
-        // 2. Injetar a dependência na Fachada de Comunicação
         FachadaNotificacaoComunicacao fachadaCom = new FachadaNotificacaoComunicacao(emailSender);
 
-        // 3. Configurar o padrão Observer
         AssuntoNotificacao assunto = new AssuntoNotificacao();
         assunto.adicionarObservador(new NotificadorEmail(fachadaCom));
         assunto.adicionarObservador(new NotificadorTelegram(fachadaCom));
 
-        // 4. Montar a Fachada Principal do Sistema.
         ValidadorExame validador = new ValidadorExame();
         FilaPrioridade fila = new FilaPrioridade();
         EmissorLaudo emissor = new EmissorLaudo();
-        Pagamento pagamento = new Pagamento(); // A nova classe de pagamento
+        Pagamento pagamento = new Pagamento(); 
         
         SistemaDiagnosticoFacade sistema = new SistemaDiagnosticoFacade(validador, fila, emissor, assunto, pagamento);
 
-        // --- Leitura e Processamento dos Dados do CSV ---
         LeitorCSV leitor = new LeitorCSV(caminho);
         List<String[]> linhas = leitor.lerLinhas();
 

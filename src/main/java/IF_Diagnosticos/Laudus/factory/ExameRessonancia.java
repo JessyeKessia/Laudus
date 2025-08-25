@@ -36,7 +36,6 @@ public class ExameRessonancia extends Exame {
     public String getLaudoDescricao(){ return laudoDescricao; }
     public void setLaudoDescricao(String desc){ this.laudoDescricao = desc; }
 
-    // Para compatibilidade com ValidadorExame
     public boolean getUtilizouContraste() { return utilizouContraste; }
     public void setUtilizouContraste(boolean utilizouContraste) { this.utilizouContraste = utilizouContraste; }
 
