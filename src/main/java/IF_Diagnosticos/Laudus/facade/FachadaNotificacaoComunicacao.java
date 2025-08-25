@@ -1,6 +1,7 @@
-package IF_Diagnosticos.Laudus.notificacao;
+package IF_Diagnosticos.Laudus.facade;
 
 import IF_Diagnosticos.Laudus.entidades.Paciente;
+import IF_Diagnosticos.Laudus.notificacao.EmailSender;
 import jakarta.mail.MessagingException;
 
 import java.io.File;

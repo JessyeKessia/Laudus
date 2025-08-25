@@ -21,7 +21,6 @@ public abstract class Exame {
     private Medico medico;
     private EstadoPagamento estadoPagamento = new PagamentoPendente();
 
-    // Construtor que aceita valorBase
     public Exame(Prioridade prioridade, Paciente paciente, Medico medico) {
         this.numeroSequencial = String.valueOf(GeradorNumeroSequencial.getInstancia().getProximoNumero());
         this.dataSolicitacao = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -35,7 +34,6 @@ public abstract class Exame {
     public String getNumeroSequencial() { return numeroSequencial; }
     public void setNumeroSequencial(String novo) { this.numeroSequencial = novo; }
 
-    // precisa para aplicar os descontos nos exames
     public double getValorBase() { return valorBase; }
     public void setValorBase(double valorBase) { this.valorBase = valorBase; }
 
