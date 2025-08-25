@@ -1,10 +1,8 @@
-
-
 package IF_Diagnosticos.Laudus.facade;
 
 import IF_Diagnosticos.Laudus.factory.Exame;
 import java.io.File;
-import IF_Diagnosticos.Laudus.notificacao.*;
+import IF_Diagnosticos.Laudus.notificacao.AssuntoNotificacao;
 import IF_Diagnosticos.Laudus.pagamento.*;
 import IF_Diagnosticos.Laudus.prioridade.FilaPrioridade;
 
@@ -14,43 +12,56 @@ public class SistemaDiagnosticoFacade {
     private final EmissorLaudo emissor;
     private final AssuntoNotificacao assunto;
     private final Pagamento pagamento;
-    private final EmailSender emailSender;
 
-    public SistemaDiagnosticoFacade(ValidadorExame validador, FilaPrioridade fila, EmissorLaudo emissor, AssuntoNotificacao assunto, Pagamento pagamento, EmailSender emailSender){
+    public SistemaDiagnosticoFacade(ValidadorExame validador, FilaPrioridade fila, EmissorLaudo emissor, AssuntoNotificacao assunto, Pagamento pagamento) {
         this.validador = validador;
         this.fila = fila;
         this.emissor = emissor;
         this.assunto = assunto;
         this.pagamento = pagamento;
-        this.emailSender = emailSender;
     }
 
-    public void processar(Exame exame, boolean aplicarOutubroRosa){
-        // 1) Pagamento
-        boolean ok = pagamento.processarPagamento(exame, aplicarOutubroRosa);
-        if (!ok) {
-            System.out.println("Falha no pagamento. Exame não seguirá para processamento.");
-            return;
+    public void processar(Exame exame, boolean aplicarOutubroRosa) {
+        // --- ETAPA 1: PAGAMENTO ---
+        boolean pagamentoAprovado = pagamento.processarPagamento(exame, aplicarOutubroRosa);
+        if (!pagamentoAprovado) {
+            System.out.println("Processamento do exame para " + exame.getPaciente().getNome() + " interrompido devido à falha no pagamento.");
+            System.out.println("----------------------------------------------------");
+            return; 
+        }
+        System.out.println("Pagamento aprovado. Prosseguindo com o processamento do exame...");
+
+        // --- ETAPA 2: FILA DE PRIORIDADE ---
+        fila.adicionarExame(exame);
+        Exame exam = fila.processarProximo(); 
+
+        // --- ETAPA 3: VALIDAÇÃO (COM VERIFICAÇÃO) ---
+        // O método 'validar' agora retorna um objeto 'ResultadoValidacao'.
+        ResultadoValidacao resultado = validador.validar(exam);
+
+        // Verificamos o status do resultado. Se não for sucesso, interrompemos o fluxo.
+        if (!resultado.isSucesso()) {
+            System.out.println("Processamento interrompido. Motivo: " + resultado.getConteudo());
+            // Opcional: você poderia notificar o paciente sobre o cancelamento aqui se quisesse.
+            // assunto.notificar(exam.getPaciente(), resultado.getConteudo(), null);
+            System.out.println("----------------------------------------------------");
+            return; // INTERROMPE O PROCESSO AQUI
         }
 
-        // 2) Fila por prioridade
-        fila.adicionarExame(exame);
-        Exame exam = fila.processarProximo();
+        // Se a validação foi um sucesso, pegamos o conteúdo para prosseguir.
+        String conteudo = resultado.getConteudo();
 
-        // 3) Validação
-        String conteudo = validador.validar(exam);
+        // --- ETAPA 4: EMISSÃO DE LAUDO ---
+        File laudoPdf = emissor.gerarArquivosLaudo(exam, conteudo);
 
-        // 4) Emissão (TXT, HTML e PDF via Bridge/Adapter)
-        emissor.gerarArquivosLaudo(exam, conteudo);
-
-        // 5) Notificação (Observer)
-        assunto.notificar(exam.getPaciente(), "Seu laudo (" + exam.getTipo() + " - " + exam.getPrioridade() + ") foi emitido. Arquivo PDF: " + caminhoPdf);
-
-        // 6) Envio do PDF por e-mail
-        String destinatario = exam.getPaciente().getEmail();
-        String assuntoEmail = "Seu laudo médico foi emitido";
-        String mensagemEmail = "Olá, segue em anexo o seu laudo médico em PDF.";
-        File pdfFile = new File(caminhoPdf);
-        emailSender.enviarComAnexo(destinatario, assuntoEmail, mensagemEmail, pdfFile);
+        // --- ETAPA 5: NOTIFICAÇÃO ---
+        if (laudoPdf != null && laudoPdf.exists()) {
+            String mensagem = "Seu laudo (" + exam.getTipo() + ") foi emitido com sucesso e segue em anexo para seu email.";
+            assunto.notificar(exam.getPaciente(), mensagem, laudoPdf);
+        } else {
+            String mensagemDeErro = "Seu laudo (" + exam.getTipo() + ") foi processado, mas houve um erro ao gerar o arquivo PDF. Por favor, entre em contato com a clínica.";
+            assunto.notificar(exam.getPaciente(), mensagemDeErro, null);
+        }
+        System.out.println("----------------------------------------------------");
     }
 }

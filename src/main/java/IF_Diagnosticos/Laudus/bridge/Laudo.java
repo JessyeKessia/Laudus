@@ -1,6 +1,7 @@
 package IF_Diagnosticos.Laudus.bridge;
 
 import IF_Diagnosticos.Laudus.factory.Exame;
+import java.io.File;
 
 public abstract class Laudo {
     protected FormatoLaudo formato;
@@ -13,5 +14,5 @@ public abstract class Laudo {
         this.conteudo = conteudo;
     }
 
-    public abstract String gerar();
+    public abstract File gerar();
 }

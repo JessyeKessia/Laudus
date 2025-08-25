@@ -1,0 +1,207 @@
+@startuml
+' Laudus - Diagrama de Classes (completo - inferido a partir do código fonte)
+skinparam classAttributeIconSize 0
+
+package IF_Diagnosticos.Laudus.main {
+  class Cliente {
+    +main(args:String[])
+  }
+}
+
+package IF_Diagnosticos.Laudus.facade {
+  class SistemaDiagnosticoFacade {
+    -validador: ValidadorExame
+    -fila: IF_Diagnosticos.Laudus.prioridade.FilaPrioridade
+    -emissor: EmissorLaudo
+    -assunto: IF_Diagnosticos.Laudus.notificacao.AssuntoNotificacao
+    -pagamento: Pagamento
+    +processar(exame: IF_Diagnosticos.Laudus.factory.Exame, aplicarOutubroRosa:boolean)
+  }
+
+  class EmissorLaudo {
+    -PASTA_LAUDOS: String
+  +gerarArquivosLaudo(exame: IF_Diagnosticos.Laudus.factory.Exame, conteudo:String): java.io.File
+  -delegatesTo: LaudoPersistence
+  }
+
+  class ValidadorExame {
+    +validar(exame: IF_Diagnosticos.Laudus.factory.Exame): ResultadoValidacao
+  }
+
+  class ResultadoValidacao {
+    -sucesso: boolean
+    -conteudo: String
+    +isSucesso(): boolean
+    +getConteudo(): String
+  }
+
+  class Pagamento {
+    +processarPagamento(exame: IF_Diagnosticos.Laudus.factory.Exame, aplicarOutubroRosa:boolean): boolean
+  }
+}
+
+package IF_Diagnosticos.Laudus.factory {
+  abstract class Exame {
+    -numeroSequencial: long
+    -tipo: String
+    -paciente: IF_Diagnosticos.Laudus.entidades.Paciente
+    +getNumeroSequencial(): long
+    +getTipo(): String
+    +getPaciente(): IF_Diagnosticos.Laudus.entidades.Paciente
+  }
+
+  class ExameLaboratorial
+  class ExameRaioX
+  class ExameRessonancia
+  class ExameSimpleFactory {
+    +criarExame(tipo:String,...): Exame
+  }
+
+  Exame <|-- ExameLaboratorial
+  Exame <|-- ExameRaioX
+  Exame <|-- ExameRessonancia
+}
+
+package IF_Diagnosticos.Laudus.bridge {
+  interface FormatoLaudo {
+    +formatar(exame: IF_Diagnosticos.Laudus.factory.Exame, conteudo:String): String
+  }
+
+  class Laudo {
+    +gerar(): String
+  }
+
+  class LaudoConcreto {
+    -formato: FormatoLaudo
+    -exame: IF_Diagnosticos.Laudus.factory.Exame
+    -conteudo: String
+    +gerar(): String
+  }
+
+  class FormatoTXT
+  class FormatoHTML
+  class PDFGeneratorAdapter
+  class LaudoPersistence
+
+  FormatoLaudo <|.. FormatoTXT
+  FormatoLaudo <|.. FormatoHTML
+  FormatoLaudo <|.. PDFGeneratorAdapter
+  Laudo <|-- LaudoConcreto
+}
+
+package IF_Diagnosticos.Laudus.adapter {
+  interface PDFGenerator {
+    +gerarPDF(nomeArquivo:String, conteudo:String)
+  }
+
+  class PDFGeneratorAdapter {
+    +gerarPDF(nomeArquivo:String, conteudo:String)
+  }
+
+  PDFGenerator <|.. PDFGeneratorAdapter
+}
+
+package IF_Diagnosticos.Laudus.notificacao {
+  class AssuntoNotificacao {
+    +notificar(paciente: IF_Diagnosticos.Laudus.entidades.Paciente, mensagem:String, anexo: java.io.File)
+  }
+
+  class EmailSender
+  class NotificadorEmail
+  class NotificadorTelegram
+  class ObservadorNotificacao
+  class FachadaNotificacaoComunicacao
+}
+
+package IF_Diagnosticos.Laudus.pagamento {
+  class ContextoPagamento
+  class EstadoPagamento
+  class PagamentoAprovado
+  class PagamentoPendente
+  class PagamentoRecusado
+}
+
+package IF_Diagnosticos.Laudus.desconto {
+  class DescontoConvenioFactory
+  class ExameDescontoDecorator
+  class ExameDescontoConvenio
+  class ExameDescontoIdoso
+  class ExameDescontoOutubroRosa
+  DescontoConvenioFactory --> ExameDescontoConvenio
+  ExameDescontoDecorator <|-- ExameDescontoConvenio
+  ExameDescontoDecorator <|-- ExameDescontoIdoso
+  ExameDescontoDecorator <|-- ExameDescontoOutubroRosa
+}
+
+package IF_Diagnosticos.Laudus.prioridade {
+  class FilaPrioridade {
+    -lista: java.util.List
+    +adicionarExame(exame: IF_Diagnosticos.Laudus.factory.Exame)
+    +processarProximo(): IF_Diagnosticos.Laudus.factory.Exame
+  }
+
+  class FactoryPrioridade
+  interface InsercaoFilaStrategy
+  class InsercaoUrgente
+  class InsercaoPoucoUrgente
+  class InsercaoRotina
+  class Prioridade
+}
+
+package IF_Diagnosticos.Laudus.entidades {
+  class Paciente {
+    -nome: String
+    -cpf: String
+    -email: String
+    +getNome(): String
+  }
+
+  class Medico {
+    -nome: String
+    -crm: String
+  }
+}
+
+package IF_Diagnosticos.Laudus.utils {
+  class GeradorNumeroSequencial {
+    +next(): long
+  }
+
+  class LeitorCSV {
+    +ler(path:String): java.util.List
+  }
+}
+
+package IF_Diagnosticos.Laudus.validadores {
+  class ValidadorBase {
+    +validar(exame: IF_Diagnosticos.Laudus.factory.Exame): ResultadoValidacao
+  }
+
+  class ValidadorLaboratorial
+  class ValidadorHemograma
+  class ValidadorGlicose
+  class ValidadorColesterol
+  class ValidadorHDL
+  class ValidadorLDL
+  class ValidadorCreatinina
+  class ValidadorUreia
+  class ValidadorAcidoUrico
+}
+
+' Relações entre pacotes / classes principais
+IF_Diagnosticos.Laudus.main.Cliente --> IF_Diagnosticos.Laudus.facade.SistemaDiagnosticoFacade
+IF_Diagnosticos.Laudus.facade.SistemaDiagnosticoFacade --> IF_Diagnosticos.Laudus.facade.ValidadorExame
+IF_Diagnosticos.Laudus.facade.SistemaDiagnosticoFacade --> IF_Diagnosticos.Laudus.prioridade.FilaPrioridade
+IF_Diagnosticos.Laudus.facade.SistemaDiagnosticoFacade --> IF_Diagnosticos.Laudus.facade.EmissorLaudo
+IF_Diagnosticos.Laudus.facade.SistemaDiagnosticoFacade --> IF_Diagnosticos.Laudus.notificacao.AssuntoNotificacao
+IF_Diagnosticos.Laudus.facade.SistemaDiagnosticoFacade --> IF_Diagnosticos.Laudus.facade.Pagamento
+IF_Diagnosticos.Laudus.facade.EmissorLaudo --> IF_Diagnosticos.Laudus.adapter.PDFGeneratorAdapter
+IF_Diagnosticos.Laudus.facade.EmissorLaudo --> IF_Diagnosticos.Laudus.bridge.LaudoConcreto
+IF_Diagnosticos.Laudus.bridge.LaudoConcreto --> IF_Diagnosticos.Laudus.bridge.FormatoLaudo
+IF_Diagnosticos.Laudus.factory.Exame "1" *-- "1" IF_Diagnosticos.Laudus.entidades.Paciente : possui
+
+' Observações:
+' - Alguns métodos/atributos foram inferidos a partir da estrutura e nomes dos arquivos.
+' - Para gerar imagem: usar PlantUML (localmente ou serviço online) com este arquivo `.puml`.
+
+@enduml
