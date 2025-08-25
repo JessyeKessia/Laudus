@@ -25,75 +25,97 @@ package "Entidades de Domínio" {
 ' 1. Bridge Pattern: Exame e Formatação de Laudo
 package "Padrão Bridge: Laudo" {
     interface FormatoLaudo {
-        +gerar(conteudoLaudo: String): String
+        +gerar(exame: Exame, conteudo: String): File
     }
 
-    class FormatoLaudoTexto implements FormatoLaudo { 
-        +gerar(conteudoLaudo: String): String
+    class FormatoTXT implements FormatoLaudo { 
+        +gerar(exame: Exame, conteudo: String): File
     }
-    class FormatoLaudoHtml implements FormatoLaudo { 
-        +gerar(conteudoLaudo: String): String
+    class FormatoHTML implements FormatoLaudo { 
+        +gerar(exame: Exame, conteudo: String): File
     }
-    class FormatoLaudoPdf implements FormatoLaudo { 
-        +gerar(conteudoLaudo: String): String
+    class PDFGeneratorAdapter implements FormatoLaudo { 
+        +gerar(exame: Exame, conteudo: String): File
+        -pdfService: PDFGenerator
     }
 
     class Laudo {
-        +conteudo: String
-        +cabecalho: String
-        +corpo: String
-        +rodape: String
-        +idExame: String
         +formato: FormatoLaudo
+        +medicoResponsavel: Medico
+        +gerar(): File
     }
 
     abstract class Exame {
         +idExame: String
         +paciente: Paciente
         +medicoSolicitante: Medico
-        +medicoResponsavel: Medico
         +dataExame: Date
         +precoBase: double
         +prioridade: TipoPrioridade
-        +formatoLaudo: FormatoLaudo
-        -primeiroValidador: ValidadorExame
-        -ultimoValidador: ValidadorExame
-        +adicionarRegraValidacao(regra: ValidadorExame): void
         +validar(): boolean
         +calcularPreco(): double
         +setFormatoLaudo(formato: FormatoLaudo): void
         +laudo: Laudo
     }
 
-    class Hemograma extends Exame 
-    class Ultrassonografia extends Exame
-    class RessonanciaMagnetica extends Exame
+    class ExameHemograma extends Exame 
+    class ExameUltrassonografia extends Exame
+    class ExameRessonanciaMagnetica extends Exame
 
     Exame "1" o-- "1" FormatoLaudo
     Exame "1" *-- "1" Laudo : gera >>
-    Laudo --> Paciente
-    Laudo --> Medico : solicitante
+    Exame --> Paciente
+    Exame --> Medico : solicitante
     Laudo --> Medico : responsável
     Laudo --> FormatoLaudo
 }
 
+' 1.5 Adapter Pattern: Geração de PDF
+package "Padrão Adapter: Geração de PDF" {
+    interface PDFGenerator {
+        +gerarPDF(nomeArquivo: String, conteudo: String): void
+    }
+
+    ' Serviço concreto usado pelo adapter - usa PDFBox internamente (represented by class PDFService)
+    class PDFService implements PDFGenerator {
+        +gerarPDF(nomeArquivo: String, conteudo: String): void
+    }
+
+    ' Adapter clássico: implementa FormatoLaudo e delega I/O ao PDFGenerator (injetado)
+    class PDFGeneratorAdapter implements FormatoLaudo {
+        -pdfService: PDFGenerator
+        +PDFGeneratorAdapter(pdfService: PDFGenerator)
+        +gerar(exame: Exame, conteudo: String): File
+    }
+
+    PDFGeneratorAdapter ..|> FormatoLaudo
+    PDFGeneratorAdapter --> PDFGenerator
+    PDFService ..|> PDFGenerator
+}
+
 ' 2. Chain of Responsibility: Validação de Exames
 package "Padrão Chain of Responsibility: Validação" {
-    interface ValidadorExame {
-        +setProximo(proximo: ValidadorExame): ValidadorExame
-        +validar(exame: Exame): boolean
+    interface ValidadorLaboratorial {
+        +setProximo(proximo: ValidadorLaboratorial): void
+        +handle(exame: ExameLaboratorial): String
     }
 
-    abstract class ValidadorBase implements ValidadorExame {
-        -proximo: ValidadorExame
-        +setProximo(proximo: ValidadorExame): ValidadorExame
-        +validar(exame: Exame): boolean
+    abstract class ValidadorBase implements ValidadorLaboratorial {
+        -proximo: ValidadorLaboratorial
+        +setProximo(proximo: ValidadorLaboratorial): void
+        +handle(exame: ExameLaboratorial): String
     }
 
-    class ValidadorHemograma extends ValidadorBase
-    class ValidadorImplantes extends ValidadorBase
+    class ValidadorGlicose implements ValidadorLaboratorial
+    class ValidadorCreatinina implements ValidadorLaboratorial
+    class ValidadorHDL implements ValidadorLaboratorial
+    class ValidadorLDL implements ValidadorLaboratorial
+    class ValidadorColesterol implements ValidadorLaboratorial
+    class ValidadorUreia implements ValidadorLaboratorial
+    class ValidadorAcidoUrico implements ValidadorLaboratorial
+    class ValidadorHemograma implements ValidadorLaboratorial
 
-    ValidadorBase "1" o-- "0..1" ValidadorExame
+    ValidadorBase "1" o-- "0..1" ValidadorLaboratorial
 }
 
 ' 3. Observer Pattern: Notificações
@@ -180,23 +202,51 @@ package "Padrão State: Pagamento" {
 ' 7. Facade Pattern: Orquestração do Sistema
 package "Padrão Facade: Sistema Diagnóstico" {
     class SistemaDiagnosticoFacade <<Facade>> {
-        -pacientes: List<Paciente>
-        -medicos: List<Medico>
-        -filaDePrioridade: FilaDePrioridade
-        -assuntoNotificacao: AssuntoNotificacao
-        -fachadaNotificacaoComunicacao: FachadaNotificacaoComunicacao
-        -contextoPagamento: ContextoPagamento
-        +registrarNovoExame(...): Exame
-        +processarProximoExameNaFila(): void
-        +gerarLaudoEValidar(exame: Exame): String
-        +processarPagamentoExame(...): boolean
-        +notificarPaciente(...): void
+        -validador: ValidadorExame
+        -fila: FilaPrioridade
+        -emissor: EmissorLaudo
+        -assunto: AssuntoNotificacao
+        -pagamento: Pagamento
+        +SistemaDiagnosticoFacade(validador: ValidadorExame, fila: FilaPrioridade, emissor: EmissorLaudo, assunto: AssuntoNotificacao, pagamento: Pagamento)
+        +processar(exame: Exame, aplicarOutubroRosa: boolean): void
     }
 
-    SistemaDiagnosticoFacade .right.> FilaDePrioridade
+    class ResultadoValidacao {
+        -sucesso: boolean
+        -conteudo: String
+        +ResultadoValidacao(sucesso: boolean, conteudo: String)
+        +isSucesso(): boolean
+        +getConteudo(): String
+    }
+
+    class EmissorLaudo {
+        -PASTA_LAUDOS: String
+        +gerarArquivosLaudo(exame: Exame, conteudo: String): File
+    }
+
+    class ValidadorExame {
+        +validar(exame: Exame): ResultadoValidacao
+    }
+
+    class Pagamento {
+        +processarPagamento(exame: Exame, aplicarOutubroRosa: boolean): boolean
+    }
+
+    SistemaDiagnosticoFacade .right.> FilaPrioridade
     SistemaDiagnosticoFacade .right.> AssuntoNotificacao
-    SistemaDiagnosticoFacade .right.> FachadaNotificacaoComunicacao
-    SistemaDiagnosticoFacade .right.> ContextoPagamento
+    SistemaDiagnosticoFacade .right.> EmissorLaudo
+    SistemaDiagnosticoFacade .right.> ValidadorExame
+    SistemaDiagnosticoFacade .right.> Pagamento
+    ' Dependências explícitas ligando a fachada aos serviços auxiliares com assinaturas
+    SistemaDiagnosticoFacade ..> ValidadorExame : validar(exame): ResultadoValidacao
+    ValidadorExame ..> ResultadoValidacao : retorna
+    ' ValidadorExame constrói e usa a cadeia de ValidadorLaboratorial
+    ValidadorExame ..> ValidadorLaboratorial : criarChain() / handle(exameLaboratorial): String
+    SistemaDiagnosticoFacade ..> FilaPrioridade : adicionarExame(exame) / processarProximo(): Exame
+    ' Dependência explícita mostrando que a fachada chama processarPagamento(...) em Pagamento
+    SistemaDiagnosticoFacade ..> Pagamento : processarPagamento(exame, aplicarOutubroRosa): boolean
+    ' Pagamento usa o Contexto do padrão State
+    Pagamento ..> ContextoPagamento : usa
 }
 
 ' 8. Cliente Principal

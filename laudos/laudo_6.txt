@@ -1,0 +1,16 @@
+===== LAUDO MÉDICO =====
+
+Paciente: Fernanda Lima
+Exame: Ressonância - ROTINA
+Convênio: SulAmérica
+Data: 24/08/2025
+Idade: 36 anos
+
+>>> RESULTADO <<<
+Região Examinada: Joelho D
+Contraste Utilizado: Sim
+
+Descrição do Laudo:
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+Médico Responsável: Dr. Fábio Souza - CRM: CRM/PB 8888

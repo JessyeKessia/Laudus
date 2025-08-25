@@ -1,0 +1,17 @@
+===== LAUDO MÉDICO =====
+
+Paciente: Lucas Martins
+Exame: Hemograma - ROTINA
+Convênio: 
+Data: 24/08/2025
+Idade: 23 anos
+
+>>> RESULTADO <<<
+Hemograma - Hemoglobina: 4.5 milhões/µL
+Valores de Referência:
+Homens: 13,5 – 17,5 milhões/µL
+Mulheres: 12,0 – 15,5 milhões/µL
+Crianças: 11,5 – 15,5 milhões/µL
+Críticos: < 7 milhões/µL ou > 20 milhões/µL
+
+Médico Responsável: Dra. Paula Mendes - CRM: CRM/PB 2345
